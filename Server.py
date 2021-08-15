@@ -1,3 +1,4 @@
 from Models import *
 
-k = Knjiga("Metro 2033", "123123", "Dimitrij Gluhovski")
+k = Knjiga(1, "Metro 2033", 1)
+print(k)
