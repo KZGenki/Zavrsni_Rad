@@ -5,7 +5,7 @@ from tkinter.ttk import *
 
 
 def sql_exec():
-    global table, sliders,frame_max_width, frame_max_height
+    global frame_max_width, frame_max_height
     conn = sqlite3.connect("knjizara.db")
     print("Opened database successffully")
     cursor = conn.execute(query.get())
@@ -30,12 +30,5 @@ query = StringVar()
 Entry(main, textvariable=query, width=90).grid(row=0, column=1)
 Button(main, text="Execute", command=sql_exec).grid(row=0, column=2)
 frame = Frame(main, height=0, width=frame_max_width)
-
-data_table = StringVar()
-table = []
-sliders = []
-table.append(Listbox(frame, selectmode=SINGLE))
-# table = Listbox(frame, selectmode=SINGLE, width=100)
-# table.grid(sticky = (N, S, W, E))
 frame.grid(row=1, column=0, columnspan=3)
 main.mainloop()
