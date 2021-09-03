@@ -1,0 +1,35 @@
+sql tables:
+	create table knjige
+			(id_knjige int primary key not null,
+			naslov text not null,
+			id_autora int not null,
+			godina_izdanja int,
+			indeks text not null,
+			cena real not null,
+			kolicina_na_stanju int not null,
+			deleted int not null);
+	create table autori
+			(id_autora int primary key not null,
+			ime text not null,
+			prezime text);
+	create table rezervacije
+			(id_rezervacije int primary key not null,
+			id_korisnika int not null,
+			id_knjige int not null,
+			kolicina int not null,
+			datum text not null);
+	create table racuni
+			(id_racuna int primary key not null,
+			id_korisnika int not null,
+			id_liste int not null,
+			datum text not null,
+			ukupna_cena real not null);
+	create table liste
+			(id_liste int primary key not null,
+			(id_knjige int not null,
+			kolicina knjiga int not null);
+	create table korisnici
+			(id_korisnika int primary key not null,
+			username text not null,
+			password text not null,
+			type int not null);

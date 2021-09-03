@@ -1,7 +1,8 @@
 class Knjiga:
-    def __init__(self, id_knjige, naslov, id_autora, indeks = 123, cena = 100, kolicina = 1, deleted = False):
+    def __init__(self, id_knjige, naslov, id_autora, godina=2000, indeks=123, cena=100, kolicina=1, deleted=False):
         self.__id_knjige = id_knjige
         self.naslov = naslov
+        self.godina = godina
         self.indeks = indeks
         self.id_autora = id_autora
         self.cena = cena
