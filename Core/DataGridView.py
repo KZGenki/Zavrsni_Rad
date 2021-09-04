@@ -39,20 +39,23 @@ def clear_master(master):
 def data_grid_view(master, max_width, max_height, data):
     global lb_group
     lb_group = []
+    btn_group = []
     clear_master(master)
     lb_min_width = 20
     columns = len(data[0])
-    rows = len(data)
+    rows = len(data)-1
     lb_width = int(max_width/columns)
     if lb_width < lb_min_width:
         lb_width = lb_min_width
     for i in range(columns):
+        btn_group.append(Button(master, width=int(lb_width*0.8), text=data[0][i]))
         lb_group.append(Listbox(master, selectmode=SINGLE, exportselection=0, height=rows, width=lb_width))
         for j in range(rows):
-            lb_group[i].insert(j, data[j][i])
+            lb_group[i].insert(j+1, data[j+1][i])
     #for lb in lb_group:
     #    lb.bind("<<ListboxSelect>>", lb_select)
     #    lb.grid(row=1, column=i)
     for i in range(len(lb_group)):
+        btn_group[i].grid(row=0, column=i)
         lb_group[i].bind("<<ListboxSelect>>", lb_select)
         lb_group[i].grid(row=1, column=i)

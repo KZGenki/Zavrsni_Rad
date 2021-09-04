@@ -10,14 +10,19 @@ def sql_exec():
     print("Opened database successffully")
     cursor = conn.execute(query.get())
     data = []
+    headers = []
+    for header in cursor.description:
+        headers.append(header[0])
+    data.append(headers)
     for row in cursor:
         cols = []
         for col in row:
             cols.append(col)
         data.append(row)
     data_grid_view(frame, frame_max_width, frame_max_height, data)
-    print(data)
-    print("Executed")
+    # print(data)
+    # print(cursor.description)
+    # print("Executed")
     conn.commit()
     conn.close()
 
