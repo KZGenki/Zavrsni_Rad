@@ -1,6 +1,7 @@
 from tkinter import *
 
 lb_group = []
+data = []
 
 
 def lb_select(self):
@@ -36,8 +37,9 @@ def clear_master(master):
         slave.destroy()
 
 
-def data_grid_view(master, max_width, max_height, data):
-    global lb_group, global_data
+def data_grid_view(master, max_width, max_height, sql_data):
+    global lb_group, data
+    data = sql_data
     lb_group = []
     btn_group = []
     clear_master(master)
