@@ -20,9 +20,9 @@ def sql_exec():
             cols.append(col)
         data.append(row)
     data_grid_view(frame, frame_max_width, frame_max_height, data)
-    # print(data)
+    print(data)
     # print(cursor.description)
-    # print("Executed")
+    print("Executed")
     conn.commit()
     conn.close()
 

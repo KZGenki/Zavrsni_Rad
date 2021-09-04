@@ -37,7 +37,7 @@ def clear_master(master):
 
 
 def data_grid_view(master, max_width, max_height, data):
-    global lb_group
+    global lb_group, global_data
     lb_group = []
     btn_group = []
     clear_master(master)
@@ -48,7 +48,7 @@ def data_grid_view(master, max_width, max_height, data):
     if lb_width < lb_min_width:
         lb_width = lb_min_width
     for i in range(columns):
-        btn_group.append(Button(master, width=int(lb_width*0.8), text=data[0][i]))
+        btn_group.append(Button(master, width=int(lb_width*0.8), height=1, text=data[0][i]))
         lb_group.append(Listbox(master, selectmode=SINGLE, exportselection=0, height=rows, width=lb_width))
         for j in range(rows):
             lb_group[i].insert(j+1, data[j+1][i])

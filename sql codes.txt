@@ -33,3 +33,6 @@ sql tables:
 			username text not null,
 			password text not null,
 			type int not null);
+
+sql list table names:
+    select name from sqlite_master where type='table' and name not like 'sqlite_%';
