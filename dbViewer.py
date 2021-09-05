@@ -19,12 +19,12 @@ def sql_exec():
         for col in row:
             cols.append(col)
         data.append(row)
+    conn.commit()
+    conn.close()
     data_grid_view(frame, frame_max_width, frame_max_height, data)
     print(data)
     # print(cursor.description)
     print("Executed")
-    conn.commit()
-    conn.close()
 
 
 main = Tk()
@@ -32,6 +32,7 @@ frame_max_width = int(main.config("width")[3].__str__())
 frame_max_height = 50
 Label(main, text="Query:").grid(row=0, column=0)
 query = StringVar()
+query.set("select * from company")
 Entry(main, textvariable=query, width=90).grid(row=0, column=1)
 Button(main, text="Execute", command=sql_exec).grid(row=0, column=2)
 frame = Frame(main, height=0, width=frame_max_width)

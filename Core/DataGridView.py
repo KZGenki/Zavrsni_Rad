@@ -26,9 +26,15 @@ def lb_select(self):
     else:
         if len(ar2) > 0:
             index = ar2[0]
+        else:
+            index = ar1[0]
     for listbox in lb_group:
         listbox.select_clear(0, END)
         listbox.select_set(index)
+
+
+def lb_double_click(self):
+    print("double click")
 
 
 def clear_master(master):
@@ -60,4 +66,5 @@ def data_grid_view(master, max_width, max_height, sql_data):
     for i in range(len(lb_group)):
         btn_group[i].grid(row=0, column=i)
         lb_group[i].bind("<<ListboxSelect>>", lb_select)
+        lb_group[i].bind("<Double-Button-1>", lb_double_click)
         lb_group[i].grid(row=1, column=i)
