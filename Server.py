@@ -30,14 +30,17 @@ def sql_exec(query, master):
 
 
 def users():
+    sql_exec("select * from company", frame)
     pass
 
 
 def books():
+    sql_exec("select name, age, address from company", frame)
     pass
 
 
 def authors():
+    sql_exec("select * from company", frame)
     pass
 
 
