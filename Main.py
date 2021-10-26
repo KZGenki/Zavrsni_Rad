@@ -1,6 +1,7 @@
 from tkinter import *
 from Core import *
 
-class MainWindow(Tk):
-    def __init__(self):
-        self.title = "Knjizara"
+MainWindow = Tk()
+MainWindow.wm_title("Knjizara")
+Main(MainWindow).pack()
+MainWindow.mainloop()
