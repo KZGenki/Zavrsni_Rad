@@ -29,10 +29,12 @@ sql tables:
 			(id_knjige int not null,
 			kolicina knjiga int not null);
 	create table korisnici
-			(id_korisnika int primary key not null,
-			username text not null,
-			password text not null,
+			(korisnik text primary key not null,
+            password text not null,
 			type int not null);
 
 sql list table names:
     select name from sqlite_master where type='table' and name not like 'sqlite_%';
+
+insertion example:
+    insert into korisnici (korisnik, password, type) values('Guest', 'Guest', 0)

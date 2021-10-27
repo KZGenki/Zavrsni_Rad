@@ -11,17 +11,22 @@ def sql_exec():
     cursor = conn.execute(query.get())
     data = []
     headers = []
-    for header in cursor.description:
-        headers.append(header[0])
-    data.append(headers)
-    for row in cursor:
-        cols = []
-        for col in row:
-            cols.append(col)
-        data.append(row)
-    conn.commit()
-    conn.close()
-    data_grid_view(frame, frame_max_width, frame_max_height, data)
+    try:
+        for header in cursor.description:
+            headers.append(header[0])
+    except:
+        conn.commit()
+        conn.close()
+    else:
+        data.append(headers)
+        for row in cursor:
+            cols = []
+            for col in row:
+                cols.append(col)
+            data.append(row)
+        conn.commit()
+        conn.close()
+        data_grid_view(frame, frame_max_width, frame_max_height, data)
     print(data)
     # print(cursor.description)
     print("Executed")
