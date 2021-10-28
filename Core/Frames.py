@@ -31,10 +31,10 @@ class DataGridView(Frame):
             self.lb_group[i].bind("<Double-Button-1>", self.lb_double_click)
             self.lb_group[i].grid(row=1, column=i)
 
-    def lb_select(self):
+    def lb_select(self, arg):
         pass
 
-    def lb_double_click(self):
+    def lb_double_click(self, arg):
         pass
 
 
@@ -72,7 +72,7 @@ class Workspace(Frame):
         self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
 
     def search(self):
-        data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear, self.varYear2, self.varAuthor, self.varTitle))
+        data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(), self.varAuthor.get(), self.varTitle.get()))
         self.DataGridView.show_data(data)
         pass
 
