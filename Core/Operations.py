@@ -1,5 +1,7 @@
 import sqlite3
 
+import Core
+
 
 class User:
     def __init__(self, username, password, type):
@@ -13,16 +15,17 @@ class User:
 
 def login(username="Guest", password="Guest"):
     conn = sqlite3.connect("knjizara.db")
-    cursor = conn.execute("select * from korisnici where korisnik=? and password =?", (username, password))
+    cursor = conn.execute("select * from korisnici where korisnik=?", (username,))
     data = []
     for col in cursor:
         data.append(col)
-    if len(data) == 1:
-        if len(data[0]) == 3:
-            if data[0][0] == username and data[0][1] == password:
-                return User(username, password, data[0][2])
     conn.close()
-    return -1
+    if len(data) != 1:
+        raise Core.LoginError("Korisnik ne postoji, proveri korisnicko ime")
+    if len(data[0]) == 3:
+        if data[0][0] == username and data[0][1] == password:
+            return User(username, password, data[0][2])
+    raise Core.LoginError("Lozinka se ne poklapa, proveri lozinku")
 
 
 def new_user(username, password):
@@ -33,21 +36,21 @@ def new_user(username, password):
         data.append(col)
     if len(data) != 0:
         conn.close()
-        return -1
+        raise Core.LoginError("Korisnicko ime je zauzeto, unesite drugo ime")
     cursor.execute("insert into korisnici (korisnik, password, type) values(?, ?, 0)", (username, password))
     conn.commit()
     cursor.execute("select * from korisnici where korisnik=? and password =?", (username, password))
     data = []
     for col in cursor:
         data.append(col)
-    if len(data) == 1:
-        if len(data[0]) == 3:
-            if data[0][0] == username and data[0][1] == password:
-                return User(username, password, data[0][2])
     conn.commit()
     conn.close()
-    return -1
-    pass
+    if len(data) != 1:
+        raise Core.LoginError("Greska u bazi, nalog nije napravljen")
+    if len(data[0]) == 3:
+        if data[0][0] == username and data[0][1] == password:
+            return User(username, password, data[0][2])
+    raise Core.LoginError("Greska u bazi, nalog je neispravan")
 
 
 def get_list(user, search_term):

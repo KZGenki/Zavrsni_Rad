@@ -51,39 +51,44 @@ class LoginFrame(Frame):
         self.btnGuest.grid(row=6, column=0)
 
     def tk_login(self):
-        result = Core.login(self.varUsername.get(), self.varPassword.get())
-
-        if result != -1:
-            Core.clear_master(self.master)
-            MainFrame(self.master, user=result).grid()
+        try:
+            self.tk_check_user_pass()
+            result = Core.login(self.varUsername.get(), self.varPassword.get())
+        except Core.LoginError as e:
+            self.tk_error_label(e)
         else:
-            self.tk_error_label("Greska u unetim podacima")
+            if result != -1:
+                Core.clear_master(self.master)
+                MainFrame(self.master, user=result).grid()
+            else:
+                self.tk_error_label("Greska u unetim podacima")
         pass
 
     def tk_new_user(self):
-        if self.varUsername.get() == "":
-            self.tk_error_label("Korisnicko polje ne sme biti prazno")
-            return
-        if self.varPassword.get() == "":
-            self.tk_error_label("Polje za lozinku ne sme biti prazno")
-            return
-        result = Core.new_user(self.varUsername.get(), self.varPassword.get())
-        if result != -1:
+        try:
+            self.tk_check_user_pass()
+            result = Core.new_user(self.varUsername.get(), self.varPassword.get())
+        except Core.LoginError as e:
+            self.tk_error_label(e)
+        else:
             Core.clear_master(self.master)
             MainFrame(self.master, user=result).grid()
-        else:
-            self.tk_error_label("Greska, " + self.varUsername.get() + " je vec zauzeto")
         pass
 
     def tk_guest(self):
-        result = Core.login()
-
-        if result != -1:
+        try:
+            result = Core.login()
+        except Core.LoginError as e:
+            self.tk_error_label(e)
+        else:
             Core.clear_master(self.master)
             MainFrame(self.master, user=result).grid()
-        else:
-            self.tk_error_label("Greska u sistemu")
-        pass
+
+    def tk_check_user_pass(self):
+        if self.varUsername.get() == "":
+            raise Core.LoginError("Korisnicko polje ne sme biti prazno")
+        if self.varPassword.get() == "":
+            raise Core.LoginError("Polje za lozinku ne sme biti prazno")
 
     def tk_error_label(self, message):
         self.errLbl.destroy()
