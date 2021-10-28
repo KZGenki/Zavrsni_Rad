@@ -4,13 +4,25 @@ import Core
 
 
 class User:
-    def __init__(self, username, password, type):
+    def __init__(self, username, password, user_type):
         self.username = username
         self.password = password
-        self.type = type
+        self.type = user_type
 
     def __str__(self):
         return self.username
+
+
+class Search:
+    def __init__(self, query, year, use_year, use_author, use_title):
+        self.query = query
+        self.year = year
+        self.use_year = use_year
+        self.use_author = use_author
+        self.use_title = use_title
+
+    def __str__(self):
+        return self.query
 
 
 def login(username="Guest", password="Guest"):
@@ -37,7 +49,7 @@ def new_user(username, password):
     if len(data) != 0:
         conn.close()
         raise Core.LoginError("Korisnicko ime je zauzeto, unesite drugo ime")
-    cursor.execute("insert into korisnici (korisnik, password, type) values(?, ?, 0)", (username, password))
+    cursor.execute("insert into korisnici (korisnik, password, type) values(?, ?, 1)", (username, password))
     conn.commit()
     cursor.execute("select * from korisnici where korisnik=? and password =?", (username, password))
     data = []
@@ -53,7 +65,27 @@ def new_user(username, password):
     raise Core.LoginError("Greska u bazi, nalog je neispravan")
 
 
-def get_list(user, search_term):
+# finish this
+def get_list(user, search_object):
+    conn = sqlite3.connect("knjizara.db")
+    cursor = conn.execute(search_object)
+    data = []
+    headers = []
+    try:
+        for header in cursor.description:
+            headers.append(header[0])
+    except:
+        pass
+    else:
+        data.append(headers)
+        for row in cursor:
+            cols = []
+            for col in row:
+                cols.append(col)
+            data.append(row)
+    finally:
+        conn.close()
+        return data
     pass
 
 
