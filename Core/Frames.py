@@ -57,11 +57,8 @@ class LoginFrame(Frame):
         except Core.LoginError as e:
             self.tk_error_label(e)
         else:
-            if result != -1:
-                Core.clear_master(self.master)
-                MainFrame(self.master, user=result).grid()
-            else:
-                self.tk_error_label("Greska u unetim podacima")
+            Core.clear_master(self.master)
+            MainFrame(self.master, user=result).grid()
         pass
 
     def tk_new_user(self):
