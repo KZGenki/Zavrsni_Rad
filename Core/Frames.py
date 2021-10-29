@@ -1,12 +1,48 @@
+import tkinter.ttk
 from tkinter import *
 
 import Core
 
 
+class CartFrame(LabelFrame):
+    def __init__(self, master=None):
+        LabelFrame.__init__(self, master, text="Korpa", padx=5, pady=5)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.listbox = Listbox(self, width=40)
+        self.listbox.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.btn_remove = Button(self, text="Ukloni", command=self.remove)
+        self.btn_remove.grid(row=1, column=0, columnspan=2, sticky="ew")
+        self.lbl_text = Label(self, text="Racun:")
+        self.lbl_text.grid(row=2, column=0, sticky="w")
+        self.var_total = StringVar()
+        self.var_total.set("0.00 Din")
+        self.lbl_total = Label(self, textvariable=self.var_total)
+        self.lbl_total.grid(row=2, column=1, sticky="e")
+        self.line = Frame(self, height=0.5, bg="black")
+        self.line.grid(row=3, column=0, columnspan=2, padx=5, pady=(0, 5), sticky="ew")
+        self.btn_buy = Button(self, text="Kupi", command=self.buy)
+        if self.master.master.user.type != 0:
+            self.btn_reservation = Button(self, text="Rezervisi", command=self.reservation)
+            self.btn_reservation.grid(row=4, column=0, sticky="ew")
+            self.btn_buy.grid(row=4, column=1, sticky="ew")
+        else:
+            self.btn_buy.grid(row=4, column=0, columnspan=2, sticky="ew")
+
+    def buy(self):
+        pass
+
+    def remove(self):
+        pass
+
+    def reservation(self):
+        pass
+
+
 class DataGridView(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master, height=120, bg="grey", relief=SUNKEN)
-        self.master = master
         self.data = None
         self.lb_group = []
         self.btn_group = []
@@ -67,7 +103,6 @@ class DataGridView(Frame):
 class Workspace(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
-        self.master = master
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=0)
@@ -93,10 +128,13 @@ class Workspace(Frame):
         Checkbutton(row, text="godini", variable=self.varYear2, onvalue=1, offvalue=0).grid(row=1, column=3)
         row.grid(row=1, column=0, columnspan=5, sticky="nw")
         # third row
-        Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=6, sticky="ew")
+        Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=5, sticky="ew")
         # fourth row, DataGridView
         self.DataGridView = DataGridView(self)
-        self.DataGridView.grid(row=3, column=0, columnspan=6, sticky="nsew")
+        self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
+        # right side
+        self.cart = CartFrame(self)
+        self.cart.grid(row=0, column=5, rowspan=4, sticky="nsew", padx=(5,0))
 
     def search(self):
         data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(), self.varAuthor.get(), self.varTitle.get()))
@@ -110,7 +148,6 @@ class Workspace(Frame):
 class MainFrame(Frame):
     def __init__(self, master=None, user=None):
         Frame.__init__(self, master, padx=5, pady=5)
-        self.master = master
         self.user = user
         self.columnconfigure(0, weight=0)
         self.columnconfigure(1, weight=1)
@@ -127,6 +164,7 @@ class MainFrame(Frame):
         self.workspace = Workspace(self)
         self.workspace.grid(row=1, column=0, columnspan=2, sticky="nsew")
 
+
     def login_screen(self):
         Core.clear_master(self.master)
         LoginFrame(self.master).grid()
@@ -137,7 +175,6 @@ class LoginFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master, padx=5, pady=5)
         self.errLbl = Label(self)
-        self.master = master
         # self.grid()
         # username
         self.lblUsername = Label(self, text="Korisnicko ime")
