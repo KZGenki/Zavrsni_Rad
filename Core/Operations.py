@@ -72,15 +72,15 @@ def get_list(user, search_object: Search):
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
         query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
-        query += "name LIKE '%?%'" if search_object.use_author == 1 else ""
+        query += "name LIKE ?" if search_object.use_author == 1 else ""
         query += " OR " if search_object.use_author+search_object.use_title == 2 else ""
-        query += "address LIKE '%?%'" if search_object.use_title == 1 else ""
+        query += "address LIKE ?" if search_object.use_title == 1 else ""
         query += ") AND " if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
         query += "age=?" if search_object.use_year == 1 else ""
 
     params = []
     for i in range(search_object.use_title + search_object.use_author):
-        params.append(search_object.query)
+        params.append("%"+search_object.query+"%")
     if search_object.use_year == 1:
         params.append(search_object.year)
 

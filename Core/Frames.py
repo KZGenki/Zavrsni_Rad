@@ -32,9 +32,35 @@ class DataGridView(Frame):
             self.lb_group[i].grid(row=1, column=i)
 
     def lb_select(self, arg):
+        ar1 = []
+        ar2 = []
+        index = 0
+        for listbox in self.lb_group:
+            if len(ar1) == 0:
+                if len(listbox.curselection()) > 0:
+                    ar1.append(listbox.curselection()[0])
+                else:
+                    ar1.append(0)
+            else:
+                if len(listbox.curselection()) > 0:
+                    if ar1[0] == listbox.curselection()[0]:
+                        ar1.append(listbox.curselection()[0])
+                    else:
+                        ar2.append(listbox.curselection()[0])
+        if len(ar1) < len(ar2):
+            index = ar1[0]
+        else:
+            if len(ar2) > 0:
+                index = ar2[0]
+            else:
+                index = ar1[0]
+        for listbox in self.lb_group:
+            listbox.select_clear(0, END)
+            listbox.select_set(index)
         pass
 
     def lb_double_click(self, arg):
+        print("DataGridView doubleclick", self, arg)
         pass
 
 
