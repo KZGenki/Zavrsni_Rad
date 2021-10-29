@@ -5,7 +5,7 @@ import Core
 
 class DataGridView(Frame):
     def __init__(self, master=None):
-        Frame.__init__(self, master)
+        Frame.__init__(self, master, height=120, bg="grey", relief=SUNKEN)
         self.master = master
         self.data = None
         self.lb_group = []
@@ -60,7 +60,7 @@ class DataGridView(Frame):
         pass
 
     def lb_double_click(self, arg):
-        print("DataGridView doubleclick", self, arg)
+        # print("DataGridView doubleclick", self, arg)
         pass
 
 
@@ -68,6 +68,7 @@ class Workspace(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master = master
+        self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=0)
         self.rowconfigure(2, weight=0)
@@ -75,7 +76,7 @@ class Workspace(Frame):
         # first row
         Label(self, text="Pretrazi:").grid(row=0, column=0)
         self.varSearch = StringVar()
-        Entry(self, textvariable=self.varSearch, width=70).grid(row=0, column=1)
+        Entry(self, textvariable=self.varSearch, width=70).grid(row=0, column=1, sticky="ew")
         Label(self, text="Godina:").grid(row=0, column=2)
         self.varYear = IntVar()
         self.varYear.set(2021)
@@ -92,10 +93,10 @@ class Workspace(Frame):
         Checkbutton(row, text="godini", variable=self.varYear2, onvalue=1, offvalue=0).grid(row=1, column=3)
         row.grid(row=1, column=0, columnspan=5, sticky="nw")
         # third row
-        Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=5, sticky="ew")
+        Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=6, sticky="ew")
         # fourth row, DataGridView
         self.DataGridView = DataGridView(self)
-        self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
+        self.DataGridView.grid(row=3, column=0, columnspan=6, sticky="nsew")
 
     def search(self):
         data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(), self.varAuthor.get(), self.varTitle.get()))
@@ -108,7 +109,7 @@ class Workspace(Frame):
 
 class MainFrame(Frame):
     def __init__(self, master=None, user=None):
-        Frame.__init__(self, master)
+        Frame.__init__(self, master, padx=5, pady=5)
         self.master = master
         self.user = user
         self.columnconfigure(0, weight=0)
@@ -134,7 +135,7 @@ class MainFrame(Frame):
 
 class LoginFrame(Frame):
     def __init__(self, master=None):
-        Frame.__init__(self, master)
+        Frame.__init__(self, master, padx=5, pady=5)
         self.errLbl = Label(self)
         self.master = master
         # self.grid()
@@ -142,14 +143,14 @@ class LoginFrame(Frame):
         self.lblUsername = Label(self, text="Korisnicko ime")
         self.lblUsername.grid(row=0, column=0)
         self.varUsername = StringVar()
-        self.entUsername = Entry(self, textvariable=self.varUsername, width=30)
-        self.entUsername.grid(row=1, column=0)
+        self.entUsername = Entry(self, textvariable=self.varUsername)
+        self.entUsername.grid(row=1, column=0, sticky="ew")
         # password
         self.lblPassword = Label(self, text="Lozinka")
         self.lblPassword.grid(row=2, column=0)
         self.varPassword = StringVar()
-        self.entPassword = Entry(self, textvariable=self.varPassword, width=30, show="*")
-        self.entPassword.grid(row=3, column=0)
+        self.entPassword = Entry(self, textvariable=self.varPassword, show="*")
+        self.entPassword.grid(row=3, column=0, sticky="ew")
         # buttons
         self.btnLogin = Button(self, text="Uloguj se", command=self.tk_login, width=30)
         self.btnLogin.grid(row=4, column=0)
@@ -165,9 +166,7 @@ class LoginFrame(Frame):
         except Core.LoginError as e:
             self.tk_error_label(e)
         else:
-            Core.clear_master(self.master)
-            MainFrame(self.master, user=result).grid()
-        pass
+            self.main_frame(result)
 
     def tk_new_user(self):
         try:
@@ -176,9 +175,7 @@ class LoginFrame(Frame):
         except Core.LoginError as e:
             self.tk_error_label(e)
         else:
-            Core.clear_master(self.master)
-            MainFrame(self.master, user=result).grid()
-        pass
+            self.main_frame(result)
 
     def tk_guest(self):
         try:
@@ -186,8 +183,11 @@ class LoginFrame(Frame):
         except Core.LoginError as e:
             self.tk_error_label(e)
         else:
-            Core.clear_master(self.master)
-            MainFrame(self.master, user=result).grid()
+            self.main_frame(result)
+
+    def main_frame(self, result):
+        Core.clear_master(self.master)
+        MainFrame(self.master, user=result).grid(sticky="nsew")
 
     def tk_check_user_pass(self):
         if self.varUsername.get() == "":

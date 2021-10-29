@@ -1,19 +1,10 @@
 from tkinter import *
 from Core import *
 
-errLbl = None
-user = None
-loginFrame = None
-
-
-
-def login_screen():
-    global loginFrame
-    loginFrame = LoginFrame(MainWindow)
-    loginFrame.grid()
-
-
-MainWindow = Tk()
-MainWindow.wm_title("Knjizara")
-login_screen()
-MainWindow.mainloop()
+if __name__ == '__main__':
+    MainWindow = Tk()
+    MainWindow.wm_title("Knjizara")
+    MainWindow.rowconfigure(0, weight=1)
+    MainWindow.columnconfigure(0, weight=1)
+    LoginFrame(MainWindow).grid(row=0, column=0, sticky="nsew")
+    MainWindow.mainloop()
