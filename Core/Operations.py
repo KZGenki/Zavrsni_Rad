@@ -25,6 +25,12 @@ class Search:
         return self.query
 
 
+def clear_master(master):
+    slaves = master.grid_slaves()
+    for slave in slaves:
+        slave.destroy()
+
+
 def login(username="Guest", password="Guest"):
     conn = sqlite3.connect("knjizara.db")
     cursor = conn.execute("select * from korisnici where korisnik=?", (username,))
@@ -65,7 +71,7 @@ def new_user(username, password):
     raise Core.LoginError("Greska u bazi, nalog je neispravan")
 
 
-# finish this
+# update sql after database data filling
 def get_list(user, search_object: Search):
     conn = sqlite3.connect("knjizara.db")
     query = "SELECT * FROM company"

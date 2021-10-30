@@ -1,4 +1,5 @@
 from tkinter import *
+from Core import *
 
 lb_group = []
 data = []
@@ -37,18 +38,12 @@ def lb_double_click(self):
     print("double click")
 
 
-def clear_master(master):
-    slaves = master.grid_slaves()
-    for slave in slaves:
-        slave.destroy()
-
-
 def data_grid_view(master, max_width, max_height, sql_data):
     global lb_group, data
     data = sql_data
     lb_group = []
     btn_group = []
-    clear_master(master)
+    Core.clear_master(master)
     lb_min_width = 20
     columns = len(data[0])
     rows = len(data)-1

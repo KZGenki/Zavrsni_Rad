@@ -1,4 +1,3 @@
-import tkinter.ttk
 from tkinter import *
 
 import Core
@@ -153,17 +152,21 @@ class MainFrame(Frame):
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
+        self.top_row = Frame(self)
         if self.user.type == 0:
-            self.btnLogout = Button(self, text="Nazad", command=self.login_screen)
-            self.lblMessage = Label(self, text="Dobrodosli")
+            self.btnLogout = Button(self.top_row, text="Nazad", command=self.login_screen)
+            self.lblMessage = Label(self.top_row, text="Dobrodosli")
         else:
-            self.btnLogout = Button(self, text="Odjava", command=self.login_screen)
-            self.lblMessage = Label(self, text="Dobrodosli, " + self.user.username)
+            self.btnLogout = Button(self.top_row, text="Odjava", command=self.login_screen)
+            self.lblMessage = Label(self.top_row, text="Dobrodosli, " + self.user.username)
         self.btnLogout.grid(row=0, column=0, sticky="w")
         self.lblMessage.grid(row=0, column=1, sticky="w")
-        self.workspace = Workspace(self)
+        self.top_row.grid(row=0, column=0, sticky="new")
+        if self.user.type != 3:
+            self.workspace = Workspace(self)
+        else:
+            self.workspace = Core.AdminFrame(self, user)
         self.workspace.grid(row=1, column=0, columnspan=2, sticky="nsew")
-
 
     def login_screen(self):
         Core.clear_master(self.master)
