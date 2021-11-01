@@ -56,7 +56,7 @@ class DataGridView(Frame):
         rows = len(self.data)-1
         lb_width = self.lb_min_width
         for i in range(columns):
-            self.btn_group.append(Button(self, width=int(lb_width*0.8), height=1, text=self.data[0][i]))
+            self.btn_group.append(Button(self, width=int(lb_width*0.8), height=1, text=self.data[0][i], command=lambda j=i: self.btn_header(j)))
             self.lb_group.append(Listbox(self, selectmode=SINGLE, exportselection=0, height=rows, width=lb_width))
             for j in range(rows):
                 self.lb_group[i].insert(j+1, self.data[j+1][i])
@@ -65,6 +65,9 @@ class DataGridView(Frame):
             self.lb_group[i].bind("<<ListboxSelect>>", self.lb_select)
             self.lb_group[i].bind("<Double-Button-1>", self.lb_double_click)
             self.lb_group[i].grid(row=1, column=i)
+
+    def btn_header(self, arg=None):
+        print(self, arg)
 
     def lb_select(self, arg):
         ar1 = []

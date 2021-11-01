@@ -1,5 +1,5 @@
 from tkinter import *
-
+import sqlite3
 import Core
 
 
@@ -24,7 +24,7 @@ class AdminFrame(Frame):
         if self.btn_user["relief"] != SUNKEN:
             self.working_frame.destroy()
             self.working_frame = Core.Workspace(self)
-            self.working_frame.grid(sticky="nsew")
+            self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_user["relief"] = SUNKEN
 
@@ -32,7 +32,7 @@ class AdminFrame(Frame):
         if self.btn_advanced["relief"] != SUNKEN:
             self.working_frame.destroy()
             self.working_frame = Core.AdvancedFrame(self)
-            self.working_frame.grid(sticky="nsew")
+            self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_advanced["relief"] = SUNKEN
 
@@ -40,8 +40,8 @@ class AdminFrame(Frame):
         if self.btn_operator["relief"] != SUNKEN:
             self.working_frame.destroy()
             self.working_frame = OperatorFrame(self)
-            self.working_frame.grid(sticky="nsew")
-            self.raise_buttons()
+            self.working_frame.grid(row=1, column=0, sticky="nsew")
+            self .raise_buttons()
             self.btn_operator["relief"] = SUNKEN
 
     def raise_buttons(self):
@@ -53,6 +53,38 @@ class AdminFrame(Frame):
 class AdvancedFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(1, weight=1)
+        Label(self, text="Query").grid(row=0, column=0, sticky="w")
+        self.varQuery = StringVar()
+        Entry(self, textvariable=self.varQuery, width=40).grid(row=0, column=1, sticky="ew")
+        Button(self, text="Execute", command=self.query).grid(row=0, column=2, sticky="e")
+        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
+
+    def query(self):
+        conn = sqlite3.connect("knjizara.db")
+        print("Opened database successffully")
+        cursor = conn.execute(self.varQuery.get())
+        data = []
+        headers = []
+        try:
+            for header in cursor.description:
+                headers.append(header[0])
+        except:
+            conn.commit()
+            conn.close()
+        else:
+            data.append(headers)
+            for row in cursor:
+                cols = []
+                for col in row:
+                    cols.append(col)
+                data.append(row)
+            conn.commit()
+            conn.close()
+            self.DataGridView.show_data(data)
+        pass
 
 
 class OperatorFrame(Frame):

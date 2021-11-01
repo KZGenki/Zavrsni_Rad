@@ -7,7 +7,11 @@ sql tables:
 			indeks text not null,
 			cena real not null,
 			kolicina_na_stanju int not null,
+			id_izdavaca int not null,
 			deleted int not null);
+	create table izdavaci
+	        (id_izdavaca int primary key not null,
+	        naziv text not null);
 	create table autori
 			(id_autora int primary key not null,
 			ime text not null,
@@ -38,3 +42,6 @@ sql list table names:
 
 insertion example:
     insert into korisnici (korisnik, password, type) values('Guest', 'Guest', 0)
+
+inner join example:
+    SELECT  naslov, godina_izdanja as 'godina izdanja', cena, ime, prezime FROM knjige INNER JOIN autori on knjige.id_autora = autori.id_autora
