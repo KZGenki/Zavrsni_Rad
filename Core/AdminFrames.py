@@ -101,3 +101,20 @@ class AdvancedFrame(Frame):
 class AdminFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+
+
+class ListUsersFrame(LabelFrame):
+    def __init__(self, master=None):
+        LabelFrame.__init__(self, master, text="Korisnici", padx=5, pady=5)
+        self.users = []
+        self.lb_users = Listbox(self)
+        self.lb_users.bind("<Double-Button-1>", self.tk_edit_selected_user)
+
+    def tk_get_users(self):
+
+        pass
+
+    def tk_edit_selected_user(self):
+        pass
+
+

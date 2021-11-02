@@ -1,5 +1,4 @@
 import sqlite3
-
 import Core
 
 
@@ -71,27 +70,12 @@ def new_user(username, password):
     raise Core.LoginError("Greska u bazi, nalog je neispravan")
 
 
-# update sql after database data filling
-def get_list(user, search_object: Search):
+def exec_query(query, params=None):
     conn = sqlite3.connect("knjizara.db")
-    query = "SELECT * FROM company"
-    if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
-        query += " WHERE "
-        query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
-        query += "name LIKE ?" if search_object.use_author == 1 else ""
-        query += " OR " if search_object.use_author+search_object.use_title == 2 else ""
-        query += "address LIKE ?" if search_object.use_title == 1 else ""
-        query += ") AND " if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
-        query += "age=?" if search_object.use_year == 1 else ""
-
-    params = []
-    for i in range(search_object.use_title + search_object.use_author):
-        params.append("%"+search_object.query+"%")
-    if search_object.use_year == 1:
-        params.append(search_object.year)
-
-    print(query, tuple(params))
-    cursor = conn.execute(query, tuple(params))
+    if params is None:
+        cursor = conn.execute(query)
+    else:
+        cursor = conn.execute(query, params)
     data = []
     headers = []
     try:
@@ -109,6 +93,28 @@ def get_list(user, search_object: Search):
     finally:
         conn.close()
         return data
+
+
+# update sql after database data filling
+def get_list(user, search_object: Search):
+    query = "SELECT * FROM company"
+    if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
+        query += " WHERE "
+        query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
+        query += "name LIKE ?" if search_object.use_author == 1 else ""
+        query += " OR " if search_object.use_author+search_object.use_title == 2 else ""
+        query += "address LIKE ?" if search_object.use_title == 1 else ""
+        query += ") AND " if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
+        query += "age=?" if search_object.use_year == 1 else ""
+
+    params = []
+    for i in range(search_object.use_title + search_object.use_author):
+        params.append("%"+search_object.query+"%")
+    if search_object.use_year == 1:
+        params.append(search_object.year)
+
+    # print(query, tuple(params))
+    return exec_query(query, params)
     pass
 
 
@@ -124,3 +130,8 @@ def list_cart(user):
 def buy(user):
     pass
 
+
+def get_users():
+    users = []
+
+    return users
