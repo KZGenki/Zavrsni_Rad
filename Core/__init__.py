@@ -1,5 +1,6 @@
 from .DataGridView import *
 from .Operations import *
-from .Frames import *
+from .UserFrames import *
 from .AdminFrames import *
 from .Exceptions import *
+from .OperatorFrames import *
