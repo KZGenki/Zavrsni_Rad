@@ -27,6 +27,16 @@ class Search:
         return self.query
 
 
+class Author:
+    def __init__(self, id_author, name, surname):
+        self.id_author = id_author
+        self.name = name
+        self.surname = surname
+
+    def __str__(self):
+        return self.name + " " + self.surname
+
+
 def clear_master(master):
     slaves = master.grid_slaves()
     for slave in slaves:
