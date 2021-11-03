@@ -1,4 +1,3 @@
-import tkinter.ttk
 from tkinter import *
 from tkinter import messagebox
 import sqlite3
@@ -77,27 +76,8 @@ class AdvancedFrame(Frame):
         self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
 
     def query(self):
-        conn = sqlite3.connect("knjizara.db")
-        cursor = conn.execute(self.varQuery.get())
-        data = []
-        headers = []
-        try:
-            for header in cursor.description:
-                headers.append(header[0])
-        except:
-            conn.commit()
-            conn.close()
-        else:
-            data.append(headers)
-            for row in cursor:
-                cols = []
-                for col in row:
-                    cols.append(col)
-                data.append(row)
-            conn.commit()
-            conn.close()
-            self.DataGridView.show_data(data)
-        pass
+        data = Core.exec_query(self.varQuery.get())
+        self.DataGridView.show_data(data)
 
 
 class AdminFrame(Frame):
@@ -144,7 +124,7 @@ class EditUserFrame(Frame):
         if self.user is not None:
             new_user_data = Core.User(self.user.username, self.varPassword.get(), self.varType.get())
             if new_user_data.password != self.user.password or new_user_data.type != self.user.type:
-                Core.exec_query("UPDATE korisnici SET password = ?, type = ? WHERE korisnik = ?", (new_user_data.password, new_user_data.type, new_user_data.username))
+                Core.update_user(new_user_data)
                 self.master.master.tk_get_users()
                 self.master.destroy()
             else:
@@ -153,7 +133,7 @@ class EditUserFrame(Frame):
             new_user_data = Core.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
             if new_user_data.password != "" and new_user_data.username != "":
                 try:
-                    Core.exec_query("INSERT INTO korisnici (korisnik, password, type) values (?, ?, ?)", (new_user_data.username, new_user_data.password, new_user_data.type))
+                    Core.new_user2(new_user_data)
                 except sqlite3.IntegrityError:
                     messagebox.showerror("Greska", "Postoji korisnik sa istim korisnickim imenom")
                 else:

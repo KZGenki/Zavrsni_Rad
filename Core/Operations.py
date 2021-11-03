@@ -151,3 +151,32 @@ def get_users():
     for i in range(len(data)-1):
         users.append(User(data[i+1][0], data[i+1][1], data[i+1][2]))
     return users
+
+
+def update_user(user):
+    exec_query("UPDATE korisnici SET password = ?, type = ? WHERE korisnik = ?",
+               (user.password, user.type, user.username))
+
+
+def new_user2(user):
+    exec_query("INSERT INTO korisnici (korisnik, password, type) values (?, ?, ?)",
+               (user.username, user.password, user.type))
+
+
+def update_authors(author):
+    data = Core.exec_query("SELECT * FROM autori WHERE id_autora = ?", (author.id_author,))
+    if len(data) == 1:
+        Core.exec_query("INSERT INTO autori (id_autora, ime, prezime) values(?, ?, ?)",
+                        (author.id_author, author.name, author.surname))
+    else:
+        Core.exec_query("UPDATE autori SET ime = ?, prezime = ? WHERE id_autora = ?",
+                        (author.name, author.surname, author.id_author))
+
+
+def get_new_author_id():
+    data = exec_query("select MAX(id_autora) from autori")
+    if data[1][0] is None:
+        author = Author(0, "", "")
+    else:
+        author = Author(data[1][0] + 1, "", "")
+    return author

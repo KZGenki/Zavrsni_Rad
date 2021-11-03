@@ -19,6 +19,9 @@ class OperatorFrame(Frame):
         pass
 
     def tk_add_author(self):
+        author = Core.get_new_author_id()
+        toplevel = Toplevel(self)
+        EditAuthor(toplevel, author).pack()
         pass
 
 
@@ -45,11 +48,8 @@ class EditAuthor(Frame):
 
     def tk_update_author(self):
         if self.author.name != self.varName.get() or self.author.surname != self.varSurname.get():
-            data = Core.exec_query("SELECT * FROM autori WHERE id_autora = ?", (self.author.id_author,))
-            if len(data) == 0:
-                Core.exec_query("INSERT INTO autori (id_autora, ime, prezime) values(?, ?, ?)", (self.author.id_author, self.varName.get(), self.varSurname.get()))
-            else:
-                Core.exec_query("UPDATE autori SET ime = ?, prezime = ? WHERE id_autora = ?", (self.varName.get(), self.varSurname.get(), self.author.id_author))
+            author = Core.Author(self.author.id_author, self.varName.get(), self.varSurname.get())
+            Core.update_authors(author)
             self.master.destroy()
         else:
             messagebox.showinfo("Obavestenje", "Nisu uneti novi podaci, nece biti izvrseno azuriranje")
