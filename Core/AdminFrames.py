@@ -156,7 +156,7 @@ class EditUserFrame(Frame):
                     Core.exec_query("INSERT INTO korisnici (korisnik, password, type) values (?, ?, ?)", (new_user_data.username, new_user_data.password, new_user_data.type))
                 except sqlite3.IntegrityError:
                     messagebox.showerror("Greska", "Postoji korisnik sa istim korisnickim imenom")
-                else:  # prozor se zatvara svejedno i kad obradi exception iznad
+                else:
                     self.master.master.tk_get_users()
                     self.master.destroy()
             else:
