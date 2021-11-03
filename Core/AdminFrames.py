@@ -74,10 +74,21 @@ class AdvancedFrame(Frame):
         Button(self, text="Execute", command=self.query).grid(row=0, column=2, sticky="e")
         self.DataGridView = Core.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
+        self.varError = StringVar()
+        Label(self, textvariable=self.varError).grid(row=2, column=0, columnspan=3, sticky="w")
 
     def query(self):
-        data = Core.exec_query(self.varQuery.get())
-        self.DataGridView.show_data(data)
+        if self.varQuery.get() == "":
+            query = "select name from sqlite_master where type='table' and name not like 'sqlite_%';"
+        else:
+            query = self.varQuery.get()
+        try:
+            data = Core.exec_query(query)
+        except sqlite3.Error as e:
+            self.varError.set(str(e))
+        else:
+            self.varError.set("Success")
+            self.DataGridView.show_data(data)
 
 
 class AdminFrame(Frame):
