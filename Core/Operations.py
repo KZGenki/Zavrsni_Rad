@@ -2,6 +2,9 @@ import sqlite3
 import Core
 
 
+user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
+
+
 class User:
     def __init__(self, username, password, user_type):
         self.username = username
@@ -91,6 +94,7 @@ def exec_query(query, params=None):
                 cols.append(col)
             data.append(row)
     finally:
+        conn.commit()
         conn.close()
         return data
 
@@ -132,6 +136,8 @@ def buy(user):
 
 
 def get_users():
+    data = exec_query("SELECT * FROM korisnici ORDER BY type DESC")
     users = []
-
+    for i in range(len(data)-1):
+        users.append(User(data[i+1][0], data[i+1][1], data[i+1][2]))
     return users

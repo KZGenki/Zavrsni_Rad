@@ -1,4 +1,6 @@
+import tkinter.ttk
 from tkinter import *
+from tkinter import messagebox
 import sqlite3
 import Core
 
@@ -101,6 +103,52 @@ class AdvancedFrame(Frame):
 class AdminFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        self.ListUsersFrame = ListUsersFrame(self)
+        self.ListUsersFrame.grid(row=0, column=0, sticky="nw")
+
+
+class EditUserFrame(Frame):
+    def __init__(self, master=None, user=None):
+        Frame.__init__(self, master)
+        self.user = user
+        self.varUsername = StringVar()
+        self.varPassword = StringVar()
+        self.varType = IntVar()
+        self.varT = StringVar()
+
+        Label(self, text="Korisnicko ime: ").grid(row=0, column=0, sticky="w")
+        usr = Entry(self, textvariable=self.varUsername, state=DISABLED)
+        usr.grid(row=0, column=1, sticky="ew")
+        Label(self, text="Lozinka: ").grid(row=1, column=0, sticky="W")
+        Entry(self, textvariable=self.varPassword).grid(row=1, column=1, sticky="ew")
+        Label(self, text="Tip: ").grid(row=2, column=0, sticky="w")
+        sb = Spinbox(self, textvariable=self.varType, from_=0, to=3, command=lambda: self.varT.set(Core.user_types[self.varType.get()]))
+        sb.grid(row=2, column=1, sticky="ew")
+        Label(self, textvariable=self.varT).grid(row=3, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Azuriraj", command=self.tk_update_user).grid(row=4, column=0, columnspan=2, sticky="ew")
+        # if editing existing user or creating new user
+        if self.user is not None:
+            self.varUsername.set(self.user.username)
+            self.varPassword.set(self.user.password)
+            self.varType.set(self.user.type)
+            self.varT.set(Core.user_types[self.user.type])
+            if self.user.type == 3:
+                if self.user.username == self.master.master.master.master.user.username:
+                    sb["state"] = DISABLED
+        else:
+            usr["state"] = NORMAL
+            self.varType.set(1)
+            self.varT.set(Core.user_types[1])
+
+    def tk_update_user(self):
+        new_user_data = Core.User(self.user.username, self.varPassword.get(), self.varType.get())
+        if new_user_data.password != self.user.password or new_user_data.type != self.user.type:
+            Core.exec_query("UPDATE korisnici SET password = ?, type = ? WHERE korisnik = ?", (new_user_data.password, new_user_data.type, new_user_data.username))
+            self.master.master.tk_get_users()
+        else:
+            messagebox.showinfo("Obavestenje", "Nisu izmenjeni podaci, nece biti izvrseno azuriranje")
+        self.master.destroy()
+        pass
 
 
 class ListUsersFrame(LabelFrame):
@@ -108,13 +156,30 @@ class ListUsersFrame(LabelFrame):
         LabelFrame.__init__(self, master, text="Korisnici", padx=5, pady=5)
         self.users = []
         self.lb_users = Listbox(self)
+        self.lb_users.grid(row=0, column=0, columnspan=2, sticky="nsew")
         self.lb_users.bind("<Double-Button-1>", self.tk_edit_selected_user)
+        Button(self, text="Dodaj", command=self.tk_add_user).grid(row=1, column=0, sticky="ew")
+        Button(self, text="Izmeni", command=self.tk_edit_selected_user).grid(row=1, column=1, sticky="ew")
+        self.tk_get_users()
 
     def tk_get_users(self):
-
+        self.lb_users.delete(0, END)
+        self.users = Core.get_users()
+        for user in self.users:
+            self.lb_users.insert(END, user)
         pass
 
-    def tk_edit_selected_user(self):
+    def tk_edit_selected_user(self, args=None):
+        try:
+            user = self.users[self.lb_users.curselection()[0]]
+        except IndexError:
+            messagebox.showwarning("Greska", "Niste izabrali korisnika")
+        else:
+            toplevel = Toplevel(self)
+            EditUserFrame(toplevel, user).pack()
         pass
 
+    def tk_add_user(self):
+        toplevel = Toplevel(self)
+        EditUserFrame(toplevel).pack()
 
