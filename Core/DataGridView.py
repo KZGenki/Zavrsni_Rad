@@ -3,12 +3,14 @@ from tkinter import *
 
 
 class DataGridView(Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, click=None, double_click=None):
         Frame.__init__(self, master, height=120, bg="grey", relief=SUNKEN)
         self.data = None
         self.lb_group = []
         self.btn_group = []
         self.lb_min_width = 20
+        self.click = click
+        self.double_click = double_click
 
     def show_data(self, sql_data):
         Core.clear_master(self)
@@ -61,5 +63,6 @@ class DataGridView(Frame):
         pass
 
     def lb_double_click(self, arg):
-        # print("DataGridView doubleclick", self, arg)
+        if self.double_click is not None:
+            self.double_click(self.lb_group[0].curselection()[0])
         pass

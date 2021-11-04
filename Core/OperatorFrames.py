@@ -7,10 +7,13 @@ import Core
 class OperatorFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(4, weight=1)
         Button(self, text="Dodaj knjigu", command=self.tk_add_book).grid(row=0, column=0, sticky="ew")
-        Button(self, text="Dodaj autora", command=self.tk_add_author).grid(row=1, column=0, sticky="ew")
-        Button(self, text="Dodaj izdavaca", command=self.tk_add_publisher).grid(row=2, column=0, sticky="ew")
-        Button(self, text="Dodaj placeholder", command=self.tk_add_book).grid(row=3, column=0, sticky="ew")
+        Button(self, text="Dodaj autora", command=self.tk_add_author).grid(row=0, column=1, sticky="ew")
+        Button(self, text="Dodaj izdavaca", command=self.tk_add_publisher).grid(row=0, column=2, sticky="ew")
+        Button(self, text="Dodaj placeholder", command=self.tk_add_book).grid(row=0, column=3, sticky="ew")
+        OperatorStorageFrame(self).grid(row=1, column=0, columnspan=5, sticky="nsew")
 
     def tk_add_book(self):
         book = Core.get_new_book_id()
@@ -39,6 +42,8 @@ class EditPublisher(Frame):
         self.varName = StringVar()
         Entry(self, textvariable=self.varName).grid(row=0, column=1, sticky="ew")
         Button(self, text="Azuriraj", command=self.tk_update_publisher).grid(row=1, column=0, columnspan=2, sticky="ew")
+        if self.publisher is not None:
+            self.varName.set(self.publisher.name)
 
     def tk_update_publisher(self):
         if self.publisher.name != self.varName.get():
@@ -106,14 +111,76 @@ class EditBook(Frame):
         Label(self, text="Sakriven: ").grid(row=7, column=0, sticky="e")
         Checkbutton(self, variable=self.varHidden, onvalue=1, offvalue=0).grid(row=7, column=1, sticky="w")
         Button(self, text="Azuriraj", command=self.tk_update_book).grid(row=8, column=0, columnspan=2, sticky="ew")
+        if self.book is not None:
+            self.varTitle.set(self.book.title)
+            self.varYear.set(self.book.year)
+            self.varIndex.set(self.book.index)
+            self.varPrice.set(self.book.price)
+            self.varQuantity.set(self.book.quantity)
+            self.varHidden.set(self.book.hidden)
+            self.cbPublishers.current(self.book.publisher)
+            self.cbAuthors.current(self.book.author)
 
     def tk_update_book(self):
         new_book = Core.Book(self.book.id_book, self.varTitle.get(), self.cbAuthors.current(), self.varYear.get(),
                              self.varIndex.get(), self.varPrice.get(), self.varQuantity.get(),
                              self.cbPublishers.current(), self.varHidden.get())
-        if not new_book.equal(self.book) and self.book.title is None:
+        if not new_book.equal(self.book):  # and self.book.title is None:
             Core.update_books(new_book)
             self.master.destroy()
         else:
             messagebox.showinfo("Obavestenje", "Nisu uneti novi podaci, nece biti izvrseno azuriranje")
         pass
+
+
+class OperatorStorageFrame(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+        self.list_of_operator_tables = ['knjige', 'autori', 'izdavaci']
+        Label(self, text="Tabela:").grid(row=0, column=0, sticky="e")
+        self.cbTable = Combobox(self, state="readonly", values=self.list_of_operator_tables)
+        self.cbTable.bind("<<ComboboxSelected>>", self.tk_cb_change)
+        self.cbTable.grid(row=0, column=1, sticky="ew")
+        self.DataGridView = Core.DataGridView(self, double_click=self.dgv_double_click)
+        self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
+
+    def tk_cb_change(self, arg=None):
+        pool = self.cbTable.get()
+        data = []
+        if pool == self.list_of_operator_tables[0]:  # knjige
+            data = Core.get_books(True)
+        if pool == self.list_of_operator_tables[1]:  # autori
+            data = Core.get_authors(True)
+        if pool == self.list_of_operator_tables[2]:  # izdavaci
+            data = Core.get_publishers(True)
+        self.DataGridView.show_data(data)
+
+    def dgv_double_click(self, index):
+        pool = self.cbTable.get()
+        if pool == self.list_of_operator_tables[0]:  # knjige
+            data = Core.get_books()[index]
+            self.toplevel_edit(book=data)
+        if pool == self.list_of_operator_tables[1]:  # autori
+            data = Core.get_authors()[index]
+            self.toplevel_edit(author=data)
+        if pool == self.list_of_operator_tables[2]:  # izdavaci
+            data = Core.get_publishers()[index]
+            self.toplevel_edit(publisher=data)
+
+    def toplevel_edit(self, book=None, author=None, publisher=None):
+        if book is not None:
+            toplevel = Toplevel(self)
+            EditBook(toplevel, book).pack()
+        elif author is not None:
+            toplevel = Toplevel(self)
+            EditAuthor(toplevel, author).pack()
+        elif publisher is not None:
+            toplevel = Toplevel(self)
+            EditPublisher(toplevel, publisher).pack()
+
+
+class OperatorUsersFrame(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)

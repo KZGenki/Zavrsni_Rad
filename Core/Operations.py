@@ -145,8 +145,9 @@ def exec_query(query, params=None):
 # update sql after database data filling
 def get_list(user, search_object: Search):
     query = "SELECT naslov AS 'Naslov', godina_izdanja AS 'Godina izdanja', (ime || ' ' || prezime) AS 'Autor', naziv" \
-            " AS 'Izdavac' FROM knjige INNER JOIN autori ON knjige.id_autora = autori.id_autora INNER JOIN izdavaci " \
-            "ON knjige.id_izdavaca = izdavaci.id_izdavaca"
+            " AS 'Izdavac' FROM knjige " \
+            "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
+            "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca WHERE deleted = 0"
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
         query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
@@ -218,8 +219,10 @@ def get_new_author_id():
     return author
 
 
-def get_authors():
+def get_authors(raw_data=None):
     data = exec_query("select * from autori")
+    if raw_data:
+        return data
     authors = []
     for i in range(len(data) - 1):
         authors.append(Author(data[i+1][0], data[i+1][1], data[i+1][2]))
@@ -243,8 +246,10 @@ def update_publishers(publisher):
         exec_query("UPDATE izdavaci SET naziv = ? WHERE id_izdavaca = ?", (publisher.name, publisher.id_publisher))
 
 
-def get_publishers():
+def get_publishers(raw_data=None):
     data = exec_query("select * from izdavaci")
+    if raw_data:
+        return data
     publishers = []
     for i in range(len(data)-1):
         publishers.append(Publisher(data[i+1][0], data[i+1][1]))
@@ -260,8 +265,10 @@ def get_new_book_id():
     return book
 
 
-def get_books():
+def get_books(raw_data=None):
     data = exec_query("select * from knjige")
+    if raw_data:
+        return data
     books = []
     for i in range(len(data)-1):
         books.append(Book(data[i+1][0], data[i+1][1], data[i+1][2], data[i+1][3], data[i+1][4], data[i+1][5],
