@@ -77,7 +77,9 @@ class Workspace(Frame):
         self.search()
 
     def search(self):
-        data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(), self.varAuthor.get(), self.varTitle.get()))
+        data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(),
+                                                           self.varYear2.get(), self.varAuthor.get(),
+                                                           self.varTitle.get()))
         self.DataGridView.show_data(data)
         pass
 

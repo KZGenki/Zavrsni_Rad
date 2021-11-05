@@ -17,19 +17,23 @@ class DataGridView(Frame):
         self.data = sql_data
         self.lb_group = []
         self.btn_group = []
-        columns = len(self.data[0])
-        rows = len(self.data)-1
-        lb_width = self.lb_min_width
-        for i in range(columns):
-            self.btn_group.append(Button(self, height=1, text=self.data[0][i], relief=FLAT, command=lambda j=i: self.btn_header(j)))
-            self.lb_group.append(Listbox(self, selectmode=SINGLE, exportselection=0, height=rows, width=lb_width))
-            for j in range(rows):
-                self.lb_group[i].insert(j+1, self.data[j+1][i])
-        for i in range(len(self.lb_group)):
-            self.btn_group[i].grid(row=0, column=i, sticky="ew", padx=0.5)
-            self.lb_group[i].bind("<<ListboxSelect>>", self.lb_select)
-            self.lb_group[i].bind("<Double-Button-1>", self.lb_double_click)
-            self.lb_group[i].grid(row=1, column=i)
+        try:
+            columns = len(self.data[0])
+            rows = len(self.data)-1
+            lb_width = self.lb_min_width
+            for i in range(columns):
+                self.btn_group.append(Button(self, height=1, text=self.data[0][i], relief=FLAT,
+                                             command=lambda j=i: self.btn_header(j)))
+                self.lb_group.append(Listbox(self, selectmode=SINGLE, exportselection=0, height=rows, width=lb_width))
+                for j in range(rows):
+                    self.lb_group[i].insert(j+1, self.data[j+1][i])
+            for i in range(len(self.lb_group)):
+                self.btn_group[i].grid(row=0, column=i, sticky="ew", padx=0.5)
+                self.lb_group[i].bind("<<ListboxSelect>>", self.lb_select)
+                self.lb_group[i].bind("<Double-Button-1>", self.lb_double_click)
+                self.lb_group[i].grid(row=1, column=i)
+        except IndexError:  # javlja se ako se prosledi data dobijen upitom koji ne vraca tabelu
+            pass
 
     def btn_header(self, arg=None):
         print(self, arg)

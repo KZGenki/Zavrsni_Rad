@@ -45,3 +45,12 @@ insertion example:
 
 inner join example:
     SELECT  naslov, godina_izdanja as 'godina izdanja', cena, ime, prezime FROM knjige INNER JOIN autori on knjige.id_autora = autori.id_autora
+
+composite key example:
+CREATE TABLE table1 (
+    table2_id INTEGER NOT NULL,
+    table3_id INTEGER NOT NULL,
+    FOREIGN KEY (table2_id) REFERENCES table2(id),
+    FOREIGN KEY (table3_id) REFERENCES table3(id),
+    PRIMARY KEY (table2_id, table3_id)
+);

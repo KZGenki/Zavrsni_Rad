@@ -113,7 +113,8 @@ class EditUserFrame(Frame):
         Label(self, text="Lozinka: ").grid(row=1, column=0, sticky="e")
         Entry(self, textvariable=self.varPassword).grid(row=1, column=1, sticky="ew")
         Label(self, text="Tip: ").grid(row=2, column=0, sticky="e")
-        sb = Spinbox(self, textvariable=self.varType, from_=0, to=3, command=lambda: self.varT.set(Core.user_types[self.varType.get()]))
+        sb = Spinbox(self, textvariable=self.varType, from_=0, to=3,
+                     command=lambda: self.varT.set(Core.user_types[self.varType.get()]))
         sb.grid(row=2, column=1, sticky="ew")
         Label(self, textvariable=self.varT).grid(row=3, column=0, columnspan=2, sticky="ew")
         Button(self, text="Azuriraj", command=self.tk_update_user).grid(row=4, column=0, columnspan=2, sticky="ew")
