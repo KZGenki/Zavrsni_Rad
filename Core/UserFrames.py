@@ -1,5 +1,5 @@
 from tkinter import *
-
+from tkinter import messagebox
 import Core
 
 
@@ -9,6 +9,7 @@ class CartFrame(LabelFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        self.items = []
         self.listbox = Listbox(self, width=40)
         self.listbox.grid(row=0, column=0, columnspan=2, sticky="nsew")
         self.btn_remove = Button(self, text="Ukloni", command=self.remove)
@@ -16,7 +17,7 @@ class CartFrame(LabelFrame):
         self.lbl_text = Label(self, text="Racun:")
         self.lbl_text.grid(row=2, column=0, sticky="w")
         self.var_total = StringVar()
-        self.var_total.set("0.00 Din")
+        self.var_total.set("0.0 Din")
         self.lbl_total = Label(self, textvariable=self.var_total)
         self.lbl_total.grid(row=2, column=1, sticky="e")
         self.line = Frame(self, height=0.5, bg="black")
@@ -26,17 +27,56 @@ class CartFrame(LabelFrame):
             self.btn_reservation = Button(self, text="Rezervisi", command=self.reservation)
             self.btn_reservation.grid(row=4, column=0, sticky="ew")
             self.btn_buy.grid(row=4, column=1, sticky="ew")
+            self.load_reservation()
         else:
             self.btn_buy.grid(row=4, column=0, columnspan=2, sticky="ew")
 
+    def add(self, book):
+        self.items.append(book)
+        self.listbox.insert(END, book)
+        self.total()
+
+    def total(self):
+        total = 0.0
+        for book in self.items:
+            total += book.price
+        self.var_total.set(str(total) + " Din")
+        return total
+
     def buy(self):
+        quantities = []
+        for book in self.items:
+            quantities.append(1)
+        cart = Core.Cart(self.master.master.user, self.items, quantities)
+        Core.buy(cart, self.total())
+        self.load_reservation()
         pass
 
     def remove(self):
+        try:
+            index = self.listbox.curselection()[0]
+            self.items.remove(self.items[index])
+            self.listbox.delete(index)
+            self.total()
+        except IndexError as e:
+            messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
         pass
 
     def reservation(self):
+        quantities = []
+        for book in self.items:
+            quantities.append(1)
+        cart = Core.Cart(self.master.master.user, self.items, quantities)
+        Core.save_cart(cart)
         pass
+
+    def load_reservation(self):
+        cart = Core.list_cart(self.master.master.user)
+        self.items = cart.books
+        self.listbox.delete(0, END)
+        for book in self.items:
+            self.listbox.insert(END, book)
+        self.total()
 
 
 class Workspace(Frame):
@@ -84,4 +124,8 @@ class Workspace(Frame):
         pass
 
     def add_to_cart(self):
+        index = self.DataGridView.index()
+        book = Core.get_book_from_search(Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(),
+                                                     self.varAuthor.get(), self.varTitle.get()), index)
+        self.cart.add(book)
         pass

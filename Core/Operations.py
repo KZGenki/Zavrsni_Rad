@@ -1,8 +1,13 @@
 import sqlite3
 import Core
+from datetime import datetime
 
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
+
+
+def now():
+    return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
 
 class User:
@@ -60,7 +65,7 @@ class Book:
         self.hidden = 0 if hidden is None else hidden
 
     def __str__(self):
-        return self.title
+        return self.title + 10*" " + str(self.price)
 
     def equal(self, book):
         if self.id_book == book.id_book and self.title == book.title and self.author == book.author and \
@@ -68,6 +73,13 @@ class Book:
                 self.quantity == book.quantity and self.publisher == book.publisher and self.hidden == book.hidden:
             return True
         return False
+
+
+class Cart:
+    def __init__(self, user, books, quantities):
+        self.user = user
+        self.books = books
+        self.quantities = quantities
 
 
 def clear_master(master):
@@ -162,23 +174,91 @@ def get_list(user, search_object: Search):
         params.append("%"+search_object.query+"%")
     if search_object.use_year == 1:
         params.append(search_object.year)
-
-    # print(query, tuple(params))
     return exec_query(query, params)
     pass
 
 
-# make_reservations
-def add_to_cart(user):
+def get_book_from_search(search_object, index):
+    query = "SELECT id_knjige FROM knjige " \
+            "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
+            "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca WHERE deleted = 0"
+    if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
+        query += " WHERE "
+        query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
+        query += "(ime || ' ' || prezime) LIKE ?" if search_object.use_author == 1 else ""
+        query += " OR " if search_object.use_author + search_object.use_title == 2 else ""
+        query += "naslov LIKE ?" if search_object.use_title == 1 else ""
+        query += ") AND " if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 \
+            else ""
+        query += "godina_izdanja=?" if search_object.use_year == 1 else ""
+    query += " LIMIT 1 OFFSET ?"
+    params = []
+    for i in range(search_object.use_title + search_object.use_author):
+        params.append("%" + search_object.query + "%")
+    if search_object.use_year == 1:
+        params.append(search_object.year)
+    params.append(index)
+    book_id = exec_query(query, params)[1][0]
+    books = get_books()
+    for book in books:
+        if book.id_book == book_id:
+            return book
     pass
+
+
+# make_reservations
+def save_cart(cart):
+    params = []
+    query = "INSERT INTO rezervacije (korisnik, id_knjige, kolicina) VALUES"
+    delete = "DELETE FROM rezervacije where korisnik = ?"
+    exec_query(delete, (cart.user.username,))
+    if len(cart.books) != 0:
+        for i in range(len(cart.books)):
+            params.append(cart.user.username)
+            params.append(cart.books[i].id_book)
+            params.append(cart.quantities[i])
+        query += " (?, ?, ?)" + (len(cart.books) - 1) * ", (?, ?, ?)"
+        print(query, "\n", params)
+        exec_query(query, tuple(params))
 
 
 def list_cart(user):
-    pass
+    query = "SELECT * FROM knjige INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige WHERE korisnik = ?"
+    data = exec_query(query, (user.username,))
+    books = []
+    quantities = []
+    for i in range(len(data) - 1):
+        books.append(Book(data[i+1][0], data[i+1][1], data[i+1][2], data[i+1][3], data[i+1][4], data[i+1][5],
+                          data[i+1][6], data[i+1][7], data[i+1][8]))
+        quantities.append(data[i+1][11])
+    return Cart(user, books, quantities)
 
 
-def buy(user):
-    pass
+def buy(cart, total_price):
+    if len(cart.books) != 0:
+        data = exec_query("select MAX(id_racuna) from racuni")
+        if data[1][0] is None:
+            bill_id = 0
+        else:
+            bill_id = data[1][0] + 1
+        # add new bill into racuni table
+        bill_query = "INSERT INTO racuni (id_racuna, korisnik, datum, popust, ukupna_cena) VALUES (?, ?, ?, ?, ?)"
+        bill_params = (bill_id, cart.user.username, now(), 0, total_price)
+        exec_query(bill_query, bill_params)
+        # add books into prodate_knjige table
+        sold_query = "INSERT INTO prodate_knjige (id_knjige, id_racuna, cena, kolicina) VALUES"
+        sold_params = []
+        for i in range(len(cart.books)):
+            sold_params.append(cart.books[i].id_book)
+            sold_params.append(bill_id)
+            sold_params.append(cart.books[i].price)
+            sold_params.append(cart.quantities[i])
+            # update storage values
+            exec_query("UPDATE knjige SET kolicina_na_stanju = ? WHERE id_knjige = ?",
+                       (cart.books[i].quantity - cart.quantities[i], cart.books[i].id_book))
+        sold_query += " (?, ?, ?, ?)" + (len(cart.books) - 1) * ", (?, ?, ?, ?)"
+        exec_query(sold_query, sold_params)
+        save_cart(Cart(cart.user, [], []))
 
 
 def get_users():

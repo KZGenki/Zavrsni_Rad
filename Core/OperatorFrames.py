@@ -20,7 +20,7 @@ class OperatorFrame(Frame):
         if self.btn_store["relief"] != SUNKEN:
             self.working_frame.destroy()
             self.working_frame = OperatorStorageFrame(self)
-            self.working_frame.grid(row=2, column=0, columnspan=5, sticky="nsew")
+            self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = SUNKEN
             self.btn_users["relief"] = RAISED
         pass
@@ -29,7 +29,7 @@ class OperatorFrame(Frame):
         if self.btn_users["relief"] != SUNKEN:
             self.working_frame.destroy()
             self.working_frame = OperatorUsersFrame(self)
-            self.working_frame.grid(row=2, column=0, columnspan=5, sticky="nsew")
+            self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = RAISED
             self.btn_users["relief"] = SUNKEN
         pass

@@ -54,3 +54,18 @@ CREATE TABLE table1 (
     FOREIGN KEY (table3_id) REFERENCES table3(id),
     PRIMARY KEY (table2_id, table3_id)
 );
+date conversion:
+select id_racuna, korisnik, strftime('%m', datum) as datum, popust, ukupna_cena from racuni
+select COUNT(id_racuna), strftime('%Y-%m-%d',datum) as datum, SUM(ukupna_cena) from racuni group by strftime('%d', datum)
+
+update key example:
+UPDATE table
+SET column_1 = new_value_1,
+    column_2 = new_value_2
+WHERE
+    search_condition
+ORDER column_or_expression
+
+create table racuni (id_racuna int primary key not null, korisnik text not null, datum text not null, popust int, ukupna_cena real not null)
+create table prodate_knjige (id_knjige int not null, id_racuna int not null, cena real not null, kolicina int not null, primary key(id_knjige, id_racuna))
+create table rezervacije (id_knjige int not null, korisnik text not null, kolicina int not null, primary key(id_knjige, korisnik))
