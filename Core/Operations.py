@@ -30,8 +30,8 @@ class Search:
 class Author:
     def __init__(self, id_author, name=None, surname=None):
         self.id_author = id_author
-        self.name = name
-        self.surname = surname
+        self.name = "" if name is None else name
+        self.surname = "" if surname is None else surname
 
     def __str__(self):
         return self.name + " " + self.surname
@@ -40,7 +40,7 @@ class Author:
 class Publisher:
     def __init__(self, id_publisher, name=None):
         self.id_publisher = id_publisher
-        self.name = name
+        self.name = "" if name is None else name
 
     def __str__(self):
         return self.name
@@ -50,14 +50,14 @@ class Book:
     def __init__(self, id_book, title=None, author=None, year=None, index=None, price=None, quantity=None,
                  publisher=None, hidden=None):
         self.id_book = id_book
-        self.title = title
-        self.author = author
-        self.year = year
-        self.index = index
-        self.price = price
-        self.quantity = quantity
-        self.publisher = publisher
-        self.hidden = hidden
+        self.title = "" if title is None else title
+        self.author = 0 if author is None else author
+        self.year = 2021 if year is None else year
+        self.index = "" if index is None else index
+        self.price = 0 if price is None else price
+        self.quantity = 0 if quantity is None else quantity
+        self.publisher = 0 if publisher is None else publisher
+        self.hidden = 0 if hidden is None else hidden
 
     def __str__(self):
         return self.title
@@ -142,7 +142,6 @@ def exec_query(query, params=None):
         return data
 
 
-# update sql after database data filling
 def get_list(user, search_object: Search):
     query = "SELECT naslov AS 'Naslov', godina_izdanja AS 'Godina izdanja', (ime || ' ' || prezime) AS 'Autor', naziv" \
             " AS 'Izdavac' FROM knjige " \

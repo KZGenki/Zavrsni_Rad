@@ -73,7 +73,8 @@ class Workspace(Frame):
         self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
         # right side
         self.cart = CartFrame(self)
-        self.cart.grid(row=0, column=5, rowspan=4, sticky="nsew", padx=(5,0))
+        self.cart.grid(row=0, column=5, rowspan=4, sticky="nsew", padx=(5, 0))
+        self.search()
 
     def search(self):
         data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(), self.varAuthor.get(), self.varTitle.get()))

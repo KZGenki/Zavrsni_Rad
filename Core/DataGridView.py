@@ -57,12 +57,21 @@ class DataGridView(Frame):
                 index = ar2[0]
             else:
                 index = ar1[0]
-        for listbox in self.lb_group:
-            listbox.select_clear(0, END)
-            listbox.select_set(index)
+        self.index(index)
         pass
 
     def lb_double_click(self, arg):
         if self.double_click is not None:
             self.double_click(self.lb_group[0].curselection()[0])
         pass
+
+    def index(self, new_index=None):
+        if new_index is None:
+            try:
+                return self.lb_group[0].curselection()[0]
+            except IndexError:
+                return -1
+        else:
+            for listbox in self.lb_group:
+                listbox.select_clear(0, END)
+                listbox.select_set(new_index)

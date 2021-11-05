@@ -79,7 +79,7 @@ class AdvancedFrame(Frame):
 
     def query(self):
         if self.varQuery.get() == "":
-            query = "select name from sqlite_master where type='table' and name not like 'sqlite_%';"
+            query = "select name as Tabele from sqlite_master where type='table' and name not like 'sqlite_%';"
         else:
             query = self.varQuery.get()
         try:

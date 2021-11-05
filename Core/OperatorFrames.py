@@ -9,28 +9,29 @@ class OperatorFrame(Frame):
         Frame.__init__(self, master)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(4, weight=1)
-        Button(self, text="Dodaj knjigu", command=self.tk_add_book).grid(row=0, column=0, sticky="ew")
-        Button(self, text="Dodaj autora", command=self.tk_add_author).grid(row=0, column=1, sticky="ew")
-        Button(self, text="Dodaj izdavaca", command=self.tk_add_publisher).grid(row=0, column=2, sticky="ew")
-        Button(self, text="Dodaj placeholder", command=self.tk_add_book).grid(row=0, column=3, sticky="ew")
-        OperatorStorageFrame(self).grid(row=1, column=0, columnspan=5, sticky="nsew")
+        self.btn_store = Button(self, text="Knjizara", command=self.tk_store, relief=SUNKEN)
+        self.btn_store.grid(row=0, column=0, sticky="ew")
+        self.btn_users = Button(self, text="Korisnici", command=self.tk_users)
+        self.btn_users.grid(row=0, column=1, sticky="ew")
+        self.working_frame = OperatorStorageFrame(self)
+        self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
 
-    def tk_add_book(self):
-        book = Core.get_new_book_id()
-        toplevel = Toplevel(self)
-        EditBook(toplevel, book).pack()
+    def tk_store(self):
+        if self.btn_store["relief"] != SUNKEN:
+            self.working_frame.destroy()
+            self.working_frame = OperatorStorageFrame(self)
+            self.working_frame.grid(row=2, column=0, columnspan=5, sticky="nsew")
+            self.btn_store["relief"] = SUNKEN
+            self.btn_users["relief"] = RAISED
         pass
 
-    def tk_add_publisher(self):
-        publisher = Core.get_new_publisher_id()
-        toplevel = Toplevel(self)
-        EditPublisher(toplevel, publisher).pack()
-        pass
-
-    def tk_add_author(self):
-        author = Core.get_new_author_id()
-        toplevel = Toplevel(self)
-        EditAuthor(toplevel, author).pack()
+    def tk_users(self):
+        if self.btn_users["relief"] != SUNKEN:
+            self.working_frame.destroy()
+            self.working_frame = OperatorUsersFrame(self)
+            self.working_frame.grid(row=2, column=0, columnspan=5, sticky="nsew")
+            self.btn_store["relief"] = RAISED
+            self.btn_users["relief"] = SUNKEN
         pass
 
 
@@ -137,14 +138,34 @@ class OperatorStorageFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.rowconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1)
+        self.columnconfigure(4, weight=1)
         self.list_of_operator_tables = ['knjige', 'autori', 'izdavaci']
         Label(self, text="Tabela:").grid(row=0, column=0, sticky="e")
         self.cbTable = Combobox(self, state="readonly", values=self.list_of_operator_tables)
         self.cbTable.bind("<<ComboboxSelected>>", self.tk_cb_change)
         self.cbTable.grid(row=0, column=1, sticky="ew")
+        self.cbTable.set(self.list_of_operator_tables[0])
+        Button(self, text="Dodaj", command=self.btn_add).grid(row=0, column=2, sticky="ew")
+        Button(self, text="Izmeni", command=self.btn_edit).grid(row=0, column=3, sticky="ew")
         self.DataGridView = Core.DataGridView(self, double_click=self.dgv_double_click)
-        self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
+        self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
+        self.tk_cb_change()
+
+    def btn_add(self):
+        pool = self.cbTable.get()
+        if pool == self.list_of_operator_tables[0]:  # knjige
+            self.tk_add_book()
+        if pool == self.list_of_operator_tables[1]:  # autori
+            self.tk_add_author()
+        if pool == self.list_of_operator_tables[2]:  # izdavaci
+            self.tk_add_publisher()
+
+    def btn_edit(self):
+        index = self.DataGridView.index()
+        if index == -1:
+            messagebox.showwarning("Upozorenje", "Niste izabrali red u tabeli")
+        else:
+            self.dgv_double_click(index)
 
     def tk_cb_change(self, arg=None):
         pool = self.cbTable.get()
@@ -179,6 +200,24 @@ class OperatorStorageFrame(Frame):
         elif publisher is not None:
             toplevel = Toplevel(self)
             EditPublisher(toplevel, publisher).pack()
+
+    def tk_add_book(self):
+        book = Core.get_new_book_id()
+        toplevel = Toplevel(self)
+        EditBook(toplevel, book).pack()
+        pass
+
+    def tk_add_publisher(self):
+        publisher = Core.get_new_publisher_id()
+        toplevel = Toplevel(self)
+        EditPublisher(toplevel, publisher).pack()
+        pass
+
+    def tk_add_author(self):
+        author = Core.get_new_author_id()
+        toplevel = Toplevel(self)
+        EditAuthor(toplevel, author).pack()
+        pass
 
 
 class OperatorUsersFrame(Frame):

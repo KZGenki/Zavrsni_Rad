@@ -20,10 +20,12 @@ class MainFrame(Frame):
         self.btnLogout.grid(row=0, column=0, sticky="w")
         self.lblMessage.grid(row=0, column=1, sticky="w")
         self.top_row.grid(row=0, column=2, sticky="ew")
-        if self.user.type != 3:
-            self.workspace = Workspace(self)
-        else:
+        if self.user.type == 3:
             self.workspace = Core.AdminMainFrame(self, user)
+        elif self.user.type == 2:
+            self.workspace = Core.OperatorFrame(self)
+        else:
+            self.workspace = Workspace(self)
         self.workspace.grid(row=1, column=0, columnspan=3, sticky="nsew")
 
     def login_screen(self):
