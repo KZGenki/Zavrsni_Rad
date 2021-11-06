@@ -17,7 +17,9 @@ class CartFrame(LabelFrame):
         self.scrollbar.grid(row=0, column=3, sticky="ns")
         self.listbox.config(yscrollcommand=self.scrollbar.set)
         self.btn_remove = Button(self, text="Ukloni", command=self.remove)
-        self.btn_remove.grid(row=1, column=0, columnspan=2, sticky="ew")
+        self.btn_remove.grid(row=1, column=0, sticky="ew")
+        self.btn_remove_one = Button(self, text="Ukloni jedan", command=self.remove_one)
+        self.btn_remove_one.grid(row=1, column=1, sticky="ew")
         self.lbl_text = Label(self, text="Racun:")
         self.lbl_text.grid(row=2, column=0, sticky="w")
         self.var_total = StringVar()
@@ -75,8 +77,28 @@ class CartFrame(LabelFrame):
             index = self.listbox.curselection()[0]
             if index % 2 == 1:
                 index = index - 1
-            self.items.remove(self.items[int(index/2)])
+            self.items.pop(int(index/2))
+            self.quantities.pop(int(index/2))
             self.listbox.delete(index, index + 1)
+            self.total()
+        except IndexError as e:
+            messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
+        pass
+
+    def remove_one(self):
+        try:
+            index = self.listbox.curselection()[0]
+            if index % 2 == 1:
+                index = index - 1
+                index = int(index/2)
+            if self.quantities[index] <= 1:
+                self.remove()
+                return
+            self.quantities[index] -= 1
+            self.listbox.delete(index * 2 + 1)
+            self.listbox.insert(index * 2 + 1, "   " + str(self.items[index].price) + " Din   x" +
+                                str(self.quantities[index]) + "     " + str(self.items[index].price *
+                                                                            self.quantities[index])+" Din")
             self.total()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
