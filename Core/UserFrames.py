@@ -85,6 +85,9 @@ class CartFrame(LabelFrame):
             self.quantities.pop(int(index/2))
             self.listbox.delete(index, index + 1)
             self.total()
+            if len(self.items) == 0:
+                Core.save_cart(Core.Cart(self.master.master.user, [], []))
+                self.master.search()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
         pass
@@ -112,6 +115,7 @@ class CartFrame(LabelFrame):
         if len(self.items) != 0:
             cart = Core.Cart(self.master.master.user, self.items, self.quantities)
             Core.save_cart(cart)
+            self.master.search()
         else:
             messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
         pass

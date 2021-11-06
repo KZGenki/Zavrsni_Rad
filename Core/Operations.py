@@ -156,9 +156,11 @@ def exec_query(query, params=None):
 
 def get_list(user, search_object: Search):
     query = "SELECT naslov AS 'Naslov', godina_izdanja AS 'Godina izdanja', (ime || ' ' || prezime) AS 'Autor', naziv" \
-            " AS 'Izdavac' FROM knjige " \
+            " AS 'Izdavac', (kolicina_na_stanju - sum(kolicina)) as Raspolozivo FROM knjige " \
             "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
-            "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca WHERE deleted = 0"
+            "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca " \
+            "INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige WHERE deleted = 0 " \
+            "GROUP BY knjige.id_knjige HAVING Raspolozivo > 0"
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
         query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
@@ -199,7 +201,7 @@ def get_book_from_search(search_object, index):
         params.append(search_object.year)
     params.append(index)
     book_id = exec_query(query, params)[1][0]
-    books = get_books()
+    books = get_books(restricted=True)
     for book in books:
         if book.id_book == book_id:
             return book
@@ -220,6 +222,8 @@ def save_cart(cart):
         query += " (?, ?, ?)" + (len(cart.books) - 1) * ", (?, ?, ?)"
         print(query, "\n", params)
         exec_query(query, tuple(params))
+    else:
+        exec_query(delete, (cart.user.username,))
 
 
 def list_cart(user):
@@ -348,8 +352,14 @@ def get_new_book_id():
     return book
 
 
-def get_books(raw_data=None):
-    data = exec_query("select * from knjige")
+def get_books(raw_data=None, restricted=None):
+    if restricted is not None:
+        data = exec_query("select knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
+                          "(kolicina_na_stanju - sum(kolicina)) as raspolozivo , id_izdavaca, deleted "
+                          "from knjige inner join rezervacije on knjige.id_knjige = rezervacije.id_knjige "
+                          "group by knjige.id_knjige")
+    else:
+        data = exec_query("select * from knjige")
     if raw_data:
         return data
     books = []
