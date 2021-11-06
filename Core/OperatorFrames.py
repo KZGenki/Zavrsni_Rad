@@ -11,8 +11,8 @@ class OperatorFrame(Frame):
         self.columnconfigure(4, weight=1)
         self.btn_store = Button(self, text="Knjizara", command=self.tk_store, relief=SUNKEN)
         self.btn_store.grid(row=0, column=0, sticky="ew")
-        self.btn_users = Button(self, text="Korisnici", command=self.tk_users)
-        self.btn_users.grid(row=0, column=1, sticky="ew")
+        self.btn_stats = Button(self, text="Statistika", command=self.tk_stats)
+        self.btn_stats.grid(row=0, column=1, sticky="ew")
         self.working_frame = OperatorStorageFrame(self)
         self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
 
@@ -22,16 +22,16 @@ class OperatorFrame(Frame):
             self.working_frame = OperatorStorageFrame(self)
             self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = SUNKEN
-            self.btn_users["relief"] = RAISED
+            self.btn_stats["relief"] = RAISED
         pass
 
-    def tk_users(self):
-        if self.btn_users["relief"] != SUNKEN:
+    def tk_stats(self):
+        if self.btn_stats["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = OperatorUsersFrame(self)
+            self.working_frame = OperatorStatsFrame(self)
             self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = RAISED
-            self.btn_users["relief"] = SUNKEN
+            self.btn_stats["relief"] = SUNKEN
         pass
 
 
@@ -147,7 +147,7 @@ class OperatorStorageFrame(Frame):
         self.cbTable.set(self.list_of_operator_tables[0])
         Button(self, text="Dodaj", command=self.btn_add).grid(row=0, column=2, sticky="ew")
         Button(self, text="Izmeni", command=self.btn_edit).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = Core.DataGridView(self, double_click=self.dgv_double_click)
+        self.DataGridView = Core.DataGridView(self, double_click=self.btn_edit)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_cb_change()
 
@@ -160,7 +160,7 @@ class OperatorStorageFrame(Frame):
         if pool == self.list_of_operator_tables[2]:  # izdavaci
             self.tk_add_publisher()
 
-    def btn_edit(self):
+    def btn_edit(self, arg=None):
         index = self.DataGridView.index()
         if index == -1:
             messagebox.showwarning("Upozorenje", "Niste izabrali red u tabeli")
@@ -171,7 +171,7 @@ class OperatorStorageFrame(Frame):
         pool = self.cbTable.get()
         data = []
         if pool == self.list_of_operator_tables[0]:  # knjige
-            data = Core.get_books(True)
+            data = Core.get_books(True, adv=True)
         if pool == self.list_of_operator_tables[1]:  # autori
             data = Core.get_authors(True)
         if pool == self.list_of_operator_tables[2]:  # izdavaci
@@ -232,6 +232,95 @@ class OperatorStorageFrame(Frame):
         pass
 
 
-class OperatorUsersFrame(Frame):
+class OperatorStatsFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(8, weight=1)
+        self.date = IntVar()
+        self.date.set(3)
+        self.to_date = StringVar()
+        self.from_date = StringVar()
+        self.from_date.set("2021-10-05")
+        self.to_date.set("2021-11-15")
+        Radiobutton(self, text="Godina", variable=self.date, value=1).grid(row=0, column=0)
+        Radiobutton(self, text="Mesec", variable=self.date, value=2).grid(row=0, column=1)
+        Radiobutton(self, text="Dan", variable=self.date, value=3).grid(row=0, column=2)
+        Label(self, text="Od:").grid(row=0, column=3)
+        DatePicker(self, textvariable=self.from_date).grid(row=0, column=4)
+        Label(self, text=" Do:").grid(row=0, column=5)
+        DatePicker(self, textvariable=self.to_date).grid(row=0, column=6)
+        Button(self, text="Filtriraj", command=self.tk_filter).grid(row=0, column=7)
+        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView.grid(row=1, column=0, columnspan=9, sticky="nsew")
+        self.tk_filter()
+
+    def tk_filter(self):
+        data = Core.stats(self.from_date.get(), self.to_date.get(), self.date.get())
+        self.DataGridView.show_data(data)
+        pass
+
+
+class DatePicker(Frame):
+    def __init__(self, master=None, textvariable=None):
+        Frame.__init__(self, master)
+        self.textvariable = textvariable
+        self.months = ["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul",
+                       "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"]
+        self.days = list(range(1, 32))
+        self.var_year = IntVar()
+        self.spin_year = Spinbox(self, textvariable=self.var_year, from_=1900, to=2050, width=4,
+                                 command=self.tk_year_picked)
+        self.cb_month = Combobox(self, state="readonly", values=self.months, width=11)
+        self.cb_month.bind("<<ComboboxSelected>>", self.tk_month_picked)
+        self.cb_day = Combobox(self, values=self.days, state="readonly", width=3)
+        self.cb_day.bind("<<ComboboxSelected>>", self.tk_day_picked)
+        self.spin_year.grid(row=0, column=0)
+        self.cb_month.grid(row=0, column=1)
+        self.cb_day.grid(row=0, column=2)
+
+        self.var_year.set(int(self.textvariable.get().split("-")[0]))
+        self.cb_month.set(self.months[int(self.textvariable.get().split("-")[1]) - 1])
+        self.cb_day.current(int(self.textvariable.get().split("-")[2]) - 1)
+        self.tk_year_picked()
+
+    def tk_year_picked(self, arg=None):
+        self.tk_month_picked()
+        pass
+
+    def tk_month_picked(self, arg=None):
+        index = self.cb_month.current()
+        day = self.cb_day.current()
+        if self.days31(index):
+            self.days = list(range(1, 32))
+        elif index == 1:
+            if self.leap_year(self.var_year.get()):
+                self.days = list(range(1, 30))
+            else:
+                self.days = list(range(1, 29))
+        else:
+            self.days = list(range(1, 31))
+        self.cb_day.config(values=self.days)
+        if day > len(self.days):
+            self.cb_day.set(len(self.days))
+        else:
+            self.cb_day.set(day+1)
+        self.tk_day_picked()
+        pass
+
+    def tk_day_picked(self, arg=None):
+        date = str(self.var_year.get()) + "-" + ("0" if (self.cb_month.current() + 1) < 10 else "") + \
+               str(self.cb_month.current() + 1) + "-" + ("0" if int(self.cb_day.get()) < 10 else "") + str(self.cb_day.get())
+        self.textvariable.set(date)
+        pass
+
+    def days31(self, month_index):
+        if month_index == 0 or month_index == 2 or month_index == 4 or month_index == 6 \
+                or month_index == 7 or month_index == 9 or month_index == 11:
+            return True
+        return False
+
+    def leap_year(self, year):
+        if year % 4 == 0 and year % 400 != 0:
+            return True
+        return False

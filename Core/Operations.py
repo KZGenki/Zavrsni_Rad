@@ -351,10 +351,15 @@ def get_new_book_id():
     return book
 
 
-def get_books(raw_data=None, restricted=None):
+def get_books(raw_data=None, adv=None, restricted=None):
     if restricted is not None:
         data = exec_query("select knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
                           "(kolicina_na_stanju - sum(kolicina)) as raspolozivo , id_izdavaca, deleted "
+                          "from knjige inner join rezervacije on knjige.id_knjige = rezervacije.id_knjige "
+                          "group by knjige.id_knjige")
+    elif adv is not None:
+        data = exec_query("select knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, kolicina_na_stanju"
+                          ", (kolicina_na_stanju - sum(kolicina)) as raspolozivo , id_izdavaca, deleted "
                           "from knjige inner join rezervacije on knjige.id_knjige = rezervacije.id_knjige "
                           "group by knjige.id_knjige")
     else:
@@ -385,4 +390,17 @@ def update_books(book):
                                                                                                 book.publisher,
                                                                                                 book.hidden,
                                                                                                 book.id_book))
-    pass
+
+
+def stats(from_date, to_date, precision):  # precision 1 year, 2 month, 3 day
+    if precision == 1:
+        format = "%Y"
+    elif precision == 2:
+        format = "%Y-%m"
+    else:
+        format = "%Y-%m-%d"
+    query = "SELECT strftime('" + format + "', datum) AS Datum, COUNT(racuni.id_racuna) AS 'Broj kupaca', SUM(ukupna_cena) " \
+            "AS Suma, SUM(id_knjige) AS 'Broj knjiga' FROM racuni INNER JOIN prodate_knjige " \
+            "ON racuni.id_racuna = prodate_knjige.id_racuna WHERE Datum > ? AND Datum < ? " \
+            "GROUP BY strftime('" + format + "', datum)"
+    return exec_query(query, (from_date, to_date))
