@@ -200,23 +200,35 @@ class OperatorStorageFrame(Frame):
         elif publisher is not None:
             toplevel = Toplevel(self)
             EditPublisher(toplevel, publisher).pack()
+        toplevel.grab_set()
+        self.wait_window(toplevel)
+        self.tk_cb_change()
 
     def tk_add_book(self):
         book = Core.get_new_book_id()
         toplevel = Toplevel(self)
         EditBook(toplevel, book).pack()
+        toplevel.grab_set()
+        self.wait_window(toplevel)
+        self.tk_cb_change()
         pass
 
     def tk_add_publisher(self):
         publisher = Core.get_new_publisher_id()
         toplevel = Toplevel(self)
         EditPublisher(toplevel, publisher).pack()
+        toplevel.grab_set()
+        self.wait_window(toplevel)
+        self.tk_cb_change()
         pass
 
     def tk_add_author(self):
         author = Core.get_new_author_id()
         toplevel = Toplevel(self)
         EditAuthor(toplevel, author).pack()
+        toplevel.grab_set()
+        self.wait_window(toplevel)
+        self.tk_cb_change()
         pass
 
 

@@ -254,8 +254,12 @@ def buy(cart, total_price):
             sold_params.append(cart.books[i].price)
             sold_params.append(cart.quantities[i])
             # update storage values
-            exec_query("UPDATE knjige SET kolicina_na_stanju = ? WHERE id_knjige = ?",
-                       (cart.books[i].quantity - cart.quantities[i], cart.books[i].id_book))
+            if cart.books[i].quantity - cart.quantities[i] > 0:
+                exec_query("UPDATE knjige SET kolicina_na_stanju = ? WHERE id_knjige = ?",
+                           (cart.books[i].quantity - cart.quantities[i], cart.books[i].id_book))
+            else:
+                exec_query("UPDATE knjige SET kolicina_na_stanju = 0, deleted = 1 WHERE id_knjige = ?",
+                           (cart.books[i].id_book,))
         sold_query += " (?, ?, ?, ?)" + (len(cart.books) - 1) * ", (?, ?, ?, ?)"
         exec_query(sold_query, sold_params)
         save_cart(Cart(cart.user, [], []))

@@ -83,7 +83,7 @@ class DataGridView(Frame):
             self.scale_h.config(width=15)
 
     def btn_header(self, arg=None):
-        print(self, arg)
+        pass
 
     def lb_select(self, arg):
         ar1 = []

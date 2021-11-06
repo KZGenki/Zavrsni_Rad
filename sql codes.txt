@@ -58,6 +58,8 @@ date conversion:
 select id_racuna, korisnik, strftime('%m', datum) as datum, popust, ukupna_cena from racuni
 select COUNT(id_racuna), strftime('%Y-%m-%d',datum) as datum, SUM(ukupna_cena) from racuni group by strftime('%d', datum)
 
+select strftime('%Y-%m-%d', datum) as datum, sum(kolicina) as kolicina from racuni inner join prodate_knjige on racuni.id_racuna = prodate_knjige.id_racuna group by strftime('%m-%d', datum)
+
 update key example:
 UPDATE table
 SET column_1 = new_value_1,

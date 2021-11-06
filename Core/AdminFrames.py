@@ -187,9 +187,13 @@ class ListUsersFrame(LabelFrame):
         else:
             toplevel = Toplevel(self)
             EditUserFrame(toplevel, user).pack()
+            toplevel.grab_set()
+            self.wait_window(toplevel)
+            self.tk_get_users()
         pass
 
     def tk_add_user(self):
         toplevel = Toplevel(self)
         EditUserFrame(toplevel).pack()
+        toplevel.grab_set()
 

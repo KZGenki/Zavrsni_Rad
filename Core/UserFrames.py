@@ -71,6 +71,7 @@ class CartFrame(LabelFrame):
             cart = Core.Cart(self.master.master.user, self.items, self.quantities)
             Core.buy(cart, self.total())
             self.load_reservation()
+            self.master.search()
         else:
             messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
         pass
@@ -157,7 +158,7 @@ class Workspace(Frame):
         # third row
         Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=5, sticky="ew")
         # fourth row, DataGridView
-        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView = Core.DataGridView(self, double_click=self.add_to_cart)
         self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
         # right side
         self.cart = CartFrame(self)
@@ -171,9 +172,10 @@ class Workspace(Frame):
         self.DataGridView.show_data(data)
         pass
 
-    def add_to_cart(self):
+    def add_to_cart(self, arg=None):
         index = self.DataGridView.index()
         book = Core.get_book_from_search(Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(),
                                                      self.varAuthor.get(), self.varTitle.get()), index)
-        self.cart.add(book)
+        if book.quantity >= 1:
+            self.cart.add(book)
         pass
