@@ -94,8 +94,9 @@ class AdvancedFrame(Frame):
 class AdminFrame(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
+        self.rowconfigure(0, weight=1)
         self.ListUsersFrame = ListUsersFrame(self)
-        self.ListUsersFrame.grid(row=0, column=0, sticky="nw")
+        self.ListUsersFrame.grid(row=0, column=0, sticky="nws")
 
 
 class EditUserFrame(Frame):
@@ -160,8 +161,12 @@ class ListUsersFrame(LabelFrame):
     def __init__(self, master=None):
         LabelFrame.__init__(self, master, text="Korisnici", padx=5, pady=5)
         self.users = []
-        self.lb_users = Listbox(self)
+        self.rowconfigure(0, weight=1)
+        self.scrollbar = Scrollbar(self)
+        self.lb_users = Listbox(self, yscrollcommand=self.scrollbar.set)
         self.lb_users.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.scrollbar.config(command=self.lb_users.yview)
+        self.scrollbar.grid(row=0, column=2, sticky="ns")
         self.lb_users.bind("<Double-Button-1>", self.tk_edit_selected_user)
         Button(self, text="Dodaj", command=self.tk_add_user).grid(row=1, column=0, sticky="ew")
         Button(self, text="Izmeni", command=self.tk_edit_selected_user).grid(row=1, column=1, sticky="ew")

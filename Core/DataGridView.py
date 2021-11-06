@@ -17,12 +17,12 @@ class DataGridView(Frame):
         self.var_scale_h = IntVar()
         self.scale_v = Scale(self, variable=self.var_scale_v, orient=VERTICAL, showvalue=0, resolution=1, from_=0,
                              to=1000, sliderlength=20, command=self.slider, width=15)
+
         self.scale_h = Scale(self, variable=self.var_scale_h, orient=HORIZONTAL, showvalue=0, resolution=1, from_=0,
                              to=1000, sliderlength=20, command=self.slider, width=15)
         self.scale_v.grid(row=0, column=1, sticky="ns")
         self.scale_h.grid(row=1, column=0, sticky="ew")
         self.corner.grid(row=1, column=1, sticky="nsew")
-        #self.table.grid(row=0, column=0)
         self.tray.place(x=0, y=0)
         self.lb_min_width = 20
         self.click = click
@@ -81,7 +81,6 @@ class DataGridView(Frame):
             self.scale_h.config(width=0)
         else:
             self.scale_h.config(width=15)
-
 
     def btn_header(self, arg=None):
         print(self, arg)

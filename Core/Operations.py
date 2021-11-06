@@ -65,7 +65,7 @@ class Book:
         self.hidden = 0 if hidden is None else hidden
 
     def __str__(self):
-        return self.title + 10*" " + str(self.price)
+        return self.title
 
     def equal(self, book):
         if self.id_book == book.id_book and self.title == book.title and self.author == book.author and \

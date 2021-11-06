@@ -10,8 +10,12 @@ class CartFrame(LabelFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.items = []
+        self.quantities = []
         self.listbox = Listbox(self, width=40)
         self.listbox.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.scrollbar = Scrollbar(self, command=self.listbox.yview)
+        self.scrollbar.grid(row=0, column=3, sticky="ns")
+        self.listbox.config(yscrollcommand=self.scrollbar.set)
         self.btn_remove = Button(self, text="Ukloni", command=self.remove)
         self.btn_remove.grid(row=1, column=0, columnspan=2, sticky="ew")
         self.lbl_text = Label(self, text="Racun:")
@@ -32,22 +36,36 @@ class CartFrame(LabelFrame):
             self.btn_buy.grid(row=4, column=0, columnspan=2, sticky="ew")
 
     def add(self, book):
-        self.items.append(book)
-        self.listbox.insert(END, book)
+        index = -1
+        for i in range(len(self.items)):
+            if self.items[i].equal(book):
+                index = i
+                break
+        if index == -1:
+            self.quantities.append(1)
+            self.items.append(book)
+            self.listbox.insert(END, book)
+            self.listbox.insert(END, "   " + str(book.price) + " Din   x" + str(self.quantities[index]) + "     " +
+                                str(book.price * self.quantities[index])+" Din")
+        else:
+            if self.quantities[i] + 1 > self.items[i].quantity:
+                messagebox.showwarning("Greska", "Dostignuta je maksimalna dostupna kolicina")
+                return
+            self.quantities[i] += 1
+            self.listbox.delete(index * 2 + 1)
+            self.listbox.insert(index * 2 + 1, "   " + str(book.price) + " Din   x" +
+                                str(self.quantities[index]) + "     " + str(book.price * self.quantities[index])+" Din")
         self.total()
 
     def total(self):
         total = 0.0
-        for book in self.items:
-            total += book.price
+        for i in range(len(self.items)):
+            total += self.items[i].price * self.quantities[i]
         self.var_total.set(str(total) + " Din")
         return total
 
     def buy(self):
-        quantities = []
-        for book in self.items:
-            quantities.append(1)
-        cart = Core.Cart(self.master.master.user, self.items, quantities)
+        cart = Core.Cart(self.master.master.user, self.items, self.quantities)
         Core.buy(cart, self.total())
         self.load_reservation()
         pass
@@ -55,27 +73,29 @@ class CartFrame(LabelFrame):
     def remove(self):
         try:
             index = self.listbox.curselection()[0]
-            self.items.remove(self.items[index])
-            self.listbox.delete(index)
+            if index % 2 == 1:
+                index = index - 1
+            self.items.remove(self.items[int(index/2)])
+            self.listbox.delete(index, index + 1)
             self.total()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
         pass
 
     def reservation(self):
-        quantities = []
-        for book in self.items:
-            quantities.append(1)
-        cart = Core.Cart(self.master.master.user, self.items, quantities)
+        cart = Core.Cart(self.master.master.user, self.items, self.quantities)
         Core.save_cart(cart)
         pass
 
     def load_reservation(self):
         cart = Core.list_cart(self.master.master.user)
         self.items = cart.books
+        self.quantities = cart.quantities
         self.listbox.delete(0, END)
-        for book in self.items:
-            self.listbox.insert(END, book)
+        for i in range(len(self.items)):
+            self.listbox.insert(END, self.items[i])
+            self.listbox.insert(END, "   " + str(self.items[i].price) + " Din   x" + str(self.quantities[-1]) +
+                                "     " + str(self.items[i].price * self.quantities[-1]) + " Din")
         self.total()
 
 
