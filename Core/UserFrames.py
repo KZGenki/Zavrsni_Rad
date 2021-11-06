@@ -51,7 +51,7 @@ class CartFrame(LabelFrame):
                                 str(book.price * self.quantities[index])+" Din")
         else:
             if self.quantities[i] + 1 > self.items[i].quantity:
-                messagebox.showwarning("Greska", "Dostignuta je maksimalna dostupna kolicina")
+                messagebox.showwarning("Upozorenje", "Dostignuta je maksimalna dostupna kolicina")
                 return
             self.quantities[i] += 1
             self.listbox.delete(index * 2 + 1)
@@ -67,9 +67,12 @@ class CartFrame(LabelFrame):
         return total
 
     def buy(self):
-        cart = Core.Cart(self.master.master.user, self.items, self.quantities)
-        Core.buy(cart, self.total())
-        self.load_reservation()
+        if len(self.items) != 0:
+            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
+            Core.buy(cart, self.total())
+            self.load_reservation()
+        else:
+            messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
         pass
 
     def remove(self):
@@ -105,8 +108,11 @@ class CartFrame(LabelFrame):
         pass
 
     def reservation(self):
-        cart = Core.Cart(self.master.master.user, self.items, self.quantities)
-        Core.save_cart(cart)
+        if len(self.items) != 0:
+            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
+            Core.save_cart(cart)
+        else:
+            messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
         pass
 
     def load_reservation(self):
