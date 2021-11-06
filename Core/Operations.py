@@ -220,7 +220,6 @@ def save_cart(cart):
             params.append(cart.books[i].id_book)
             params.append(cart.quantities[i])
         query += " (?, ?, ?)" + (len(cart.books) - 1) * ", (?, ?, ?)"
-        print(query, "\n", params)
         exec_query(query, tuple(params))
     else:
         exec_query(delete, (cart.user.username,))
