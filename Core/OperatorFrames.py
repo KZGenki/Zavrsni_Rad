@@ -13,6 +13,8 @@ class OperatorFrame(Frame):
         self.btn_store.grid(row=0, column=0, sticky="ew")
         self.btn_stats = Button(self, text="Statistika", command=self.tk_stats)
         self.btn_stats.grid(row=0, column=1, sticky="ew")
+        self.btn_reservations = Button(self, text="Rezervacije", command=self.tk_reservations)
+        self.btn_reservations.grid(row=0, column=2, sticky="ew")
         self.working_frame = OperatorStorageFrame(self)
         self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
 
@@ -23,6 +25,7 @@ class OperatorFrame(Frame):
             self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = SUNKEN
             self.btn_stats["relief"] = RAISED
+            self.btn_reservations["relief"] = RAISED
         pass
 
     def tk_stats(self):
@@ -32,7 +35,17 @@ class OperatorFrame(Frame):
             self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
             self.btn_store["relief"] = RAISED
             self.btn_stats["relief"] = SUNKEN
+            self.btn_reservations["relief"] = RAISED
         pass
+
+    def tk_reservations(self):
+        if self.btn_reservations["relief"] != SUNKEN:
+            self.working_frame.destroy()
+            self.working_frame = OperatorReservationFrame(self)
+            self.working_frame.grid(row=1, column=0, columnspan=5, sticky="nsew")
+            self.btn_store["relief"] = RAISED
+            self.btn_stats["relief"] = RAISED
+            self.btn_reservations["relief"] = SUNKEN
 
 
 class EditPublisher(Frame):
@@ -324,3 +337,97 @@ class DatePicker(Frame):
         if year % 4 == 0 and year % 400 != 0:
             return True
         return False
+
+
+class OperatorReservationFrame(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(4, weight=1)
+        self.users = Core.get_users()
+        self.cb_users = Combobox(self, values=self.users, state="readonly")
+        self.cb_users.bind("<<ComboboxSelected>>", self.tk_user_selected)
+        self.cb_users.grid(row=0, column=0, sticky="ew")
+        self.cb_users.set(self.users[0])
+        Button(self, text="Ukloni", command=self.tk_remove).grid(row=0, column=1, sticky="ew")
+        Button(self, text="Izmeni", command=self.tk_edit).grid(row=0, column=2, sticky="ew")
+        Button(self, text="Dodaj", command=self.tk_add).grid(row=0, column=3, sticky="ew")
+        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
+        self.tk_user_selected()
+
+    def tk_user_selected(self, adg=None):
+        user = self.users[self.cb_users.current()]
+        self.DataGridView.show_data(Core.reservations(user))
+
+    def tk_remove(self):
+        user = self.users[self.cb_users.current()]
+        index = self.DataGridView.index()
+        if index == -1:
+            messagebox.showwarning("Upozorenje", "Niste izabrali red")
+            return
+        row = Core.reservations(user, index)
+        Core.remove_reservation(user, row[1][0])
+        self.tk_user_selected()
+
+    def tk_add(self):
+        self.toplevel(user=self.users[self.cb_users.current()])
+        pass
+
+    def tk_edit(self):
+        index = self.DataGridView.index()
+        if index == -1:
+            messagebox.showwarning("Upozorenje", "Niste izabrali red")
+            return
+        user = self.users[self.cb_users.current()]
+        row = Core.reservations(user, index)
+        self.toplevel(user=user, book=row[1][0], quantity=row[1][2])
+        pass
+
+    def toplevel(self, book=None, user=None, quantity=0):
+        toplevel = Toplevel(self)
+        EditReservation(toplevel, book, user, quantity).pack()
+        toplevel.grab_set()
+        self.wait_window(toplevel)
+        self.tk_user_selected()
+
+
+class EditReservation(Frame):
+    def __init__(self, master=None, book=None, user=None, quantity=0):
+        Frame.__init__(self, master)
+        self.books = Core.get_books()
+        self.book = book
+        self.user = user
+        self.quantity = quantity
+        Label(self, text="Knjiga").grid(row=0, column=0, sticky="e")
+        self.cb_book = Combobox(self, values=self.books, state="readonly")
+        self.cb_book.grid(row=0, column=1, sticky="ew")
+        self.cb_book.current(self.book_index_to_book())
+        Label(self, text="Korisnik").grid(row=1, column=0, sticky="e")
+        self.varUser = StringVar()
+        self.varUser.set(user.username)
+        Entry(self, textvariable=self.varUser, state=DISABLED).grid(row=1, column=1, sticky="ew")
+        Label(self, text="Kolicina").grid(row=2, column=0, sticky="e")
+        self.varQuantity = IntVar()
+        self.varQuantity.set(self.quantity)
+        Spinbox(self, textvariable=self.varQuantity, from_=0, to=10000).grid(row=2, column=1, sticky="ew")
+        Button(self, text="Azuriraj", command=self.tk_update).grid(row=3, column=0, columnspan=2, sticky="ew")
+
+    def book_index_to_book(self):
+        for i in range(len(self.books)):
+            if self.books[i].id_book == self.book:
+                return i
+
+    def tk_update(self):
+        if self.varQuantity.get() > 0 and self.varQuantity.get() != self.quantity:
+            if self.book is None:
+                if Core.add_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get()):
+                    messagebox.showerror("Greska", "Rezervacija vec postoji")
+            else:
+                Core.edit_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get())
+            self.master.destroy()
+        else:
+            if self.varQuantity.get() == 0:
+                messagebox.showwarning("Upozorenje", "Kolicina mora biti veca od 0")
+            else:
+                messagebox.showwarning("Upozorenje", "Kolicina nije promenjena")

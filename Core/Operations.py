@@ -208,7 +208,6 @@ def get_book_from_search(search_object, index):
     pass
 
 
-# make_reservations
 def save_cart(cart):
     params = []
     query = "INSERT INTO rezervacije (korisnik, id_knjige, kolicina) VALUES"
@@ -399,8 +398,39 @@ def stats(from_date, to_date, precision):  # precision 1 year, 2 month, 3 day
         format = "%Y-%m"
     else:
         format = "%Y-%m-%d"
-    query = "SELECT strftime('" + format + "', datum) AS Datum, COUNT(racuni.id_racuna) AS 'Broj kupaca', SUM(ukupna_cena) " \
-            "AS Suma, SUM(id_knjige) AS 'Broj knjiga' FROM racuni INNER JOIN prodate_knjige " \
+    query = "SELECT strftime('" + format + "', datum) AS Datum, COUNT(racuni.id_racuna) AS 'Broj kupaca', " \
+            "SUM(ukupna_cena) AS Suma, SUM(id_knjige) AS 'Broj knjiga' FROM racuni INNER JOIN prodate_knjige " \
             "ON racuni.id_racuna = prodate_knjige.id_racuna WHERE Datum > ? AND Datum < ? " \
             "GROUP BY strftime('" + format + "', datum)"
     return exec_query(query, (from_date, to_date))
+
+
+def reservations(user, index=None):
+    query = "SELECT knjige.id_knjige AS 'id_knjige', naslov, kolicina FROM knjige " \
+            "INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige " \
+            "WHERE korisnik = ?"
+    if index is not None:
+        query += " LIMIT 1 OFFSET ?"
+        return exec_query(query, (user.username, index))
+    return exec_query(query, (user.username,))
+
+
+def remove_reservation(user, book_id):
+    query = "DELETE FROM rezervacije WHERE korisnik = ? AND id_knjige = ?"
+    exec_query(query, (user.username, book_id))
+
+
+def add_reservation(user, book, quantity):
+    query = "SELECT * FROM rezervacije WHERE id_knjige = ? AND korisnik = ?"
+    data = exec_query(query, (book.id_book, user.username))
+    if len(data) == 1:
+        query = "INSERT INTO rezervacije (korisnik, id_knjige, kolicina) VALUES (?, ?, ?)"
+        exec_query(query, (user.username, book.id_book, quantity))
+        return True
+    else:
+        return False
+
+
+def edit_reservation(user, book, quantity):
+    query = "UPDATE rezervacije SET kolicina = ? WHERE korisnik = ? AND id_knjige = ?"
+    exec_query(query, (quantity, user.username, book.id_book))
