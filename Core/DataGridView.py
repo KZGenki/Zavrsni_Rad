@@ -46,14 +46,18 @@ class DataGridView(Frame):
                 self.btn_group.append(Button(self.tray, height=1, text=self.data[0][i], relief=FLAT,
                                              command=lambda j=i: self.btn_header(j)))
                 self.lb_group.append(Listbox(self.tray, selectmode=SINGLE, exportselection=0, height=rows,
-                                             width=lb_width))
+                                             borderwidth=0, highlightthickness=0))
+                max_width = 0
                 for j in range(rows):
                     self.lb_group[i].insert(j+1, self.data[j+1][i])
+                    if len(str(self.data[j+1][i])) > max_width:
+                        max_width = len(str(self.data[j+1][i])) + 1
+                self.lb_group[i].config(width=max_width)
             for i in range(len(self.lb_group)):
-                self.btn_group[i].grid(row=0, column=i, sticky="ew", padx=0.5)
+                self.btn_group[i].grid(row=0, column=i, sticky="ew")
                 self.lb_group[i].bind("<<ListboxSelect>>", self.lb_select)
                 self.lb_group[i].bind("<Double-Button-1>", self.lb_double_click)
-                self.lb_group[i].grid(row=1, column=i)
+                self.lb_group[i].grid(row=1, column=i, sticky="ew")
             self.set_scales()
         except IndexError:
             pass
