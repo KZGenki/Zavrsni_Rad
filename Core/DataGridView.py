@@ -50,6 +50,8 @@ class DataGridView(Frame):
                 max_width = 0
                 for j in range(rows):
                     self.lb_group[i].insert(j+1, self.data[j+1][i])
+                    if j % 2 == 1:
+                        self.lb_group[i].itemconfig(j, {"bg": "grey95"})
                     if len(str(self.data[j+1][i])) > max_width:
                         max_width = len(str(self.data[j+1][i])) + 1
                 self.lb_group[i].config(width=max_width)
