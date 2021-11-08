@@ -28,8 +28,13 @@ class DataGridView(Frame):
         self.click = click
         self.double_click = double_click
         self.bind("<Configure>", self.set_scales)
+        self.bind_all("<MouseWheel>", self.mouse_scroll)
 
-    def slider(self, arg):
+    def mouse_scroll(self, arg):
+        self.var_scale_v.set(self.var_scale_v.get() - arg.delta/120*15)
+        self.slider()
+
+    def slider(self, arg=None):
         self.tray.place_configure(x=-self.var_scale_h.get(), y=-self.var_scale_v.get())
         pass
 
