@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import Combobox
-import Core
+import GUI
+import Operations
 
 
 class OperatorFrame(Frame):
@@ -61,8 +62,8 @@ class EditPublisher(Frame):
 
     def tk_update_publisher(self):
         if self.publisher.name != self.varName.get():
-            publisher = Core.Publisher(self.publisher.id_publisher, self.varName.get())
-            Core.update_publishers(publisher)
+            publisher = Operations.Publisher(self.publisher.id_publisher, self.varName.get())
+            Operations.update_publishers(publisher)
             self.master.destroy()
         else:
             messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
@@ -80,14 +81,14 @@ class EditAuthor(Frame):
         Entry(self, textvariable=self.varSurname).grid(row=1, column=1, sticky="ew")
         Button(self, text="Ažuriraj", command=self.tk_update_author).grid(row=2, column=0, columnspan=2, sticky="ew")
         if self.author is None:
-            self.author = Core.Author(0, "", "")
+            self.author = Operations.Author(0, "", "")
         self.varName.set(self.author.name)
         self.varSurname.set(self.author.surname)
 
     def tk_update_author(self):
         if self.author.name != self.varName.get() or self.author.surname != self.varSurname.get():
-            author = Core.Author(self.author.id_author, self.varName.get(), self.varSurname.get())
-            Core.update_authors(author)
+            author = Operations.Author(self.author.id_author, self.varName.get(), self.varSurname.get())
+            Operations.update_authors(author)
             self.master.destroy()
         else:
             messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
@@ -98,8 +99,8 @@ class EditBook(Frame):
     def __init__(self, master=None, book=None):
         Frame.__init__(self, master)
         self.book = book
-        self.list_of_authors = Core.get_authors()
-        self.list_of_publishers = Core.get_publishers()
+        self.list_of_authors = Operations.get_authors()
+        self.list_of_publishers = Operations.get_publishers()
         self.varTitle = StringVar()
         self.varYear = IntVar()
         self.varIndex = StringVar()
@@ -136,11 +137,11 @@ class EditBook(Frame):
             self.cbAuthors.current(self.book.author)
 
     def tk_update_book(self):
-        new_book = Core.Book(self.book.id_book, self.varTitle.get(), self.cbAuthors.current(), self.varYear.get(),
-                             self.varIndex.get(), self.varPrice.get(), self.varQuantity.get(),
-                             self.cbPublishers.current(), self.varHidden.get())
+        new_book = Operations.Book(self.book.id_book, self.varTitle.get(), self.cbAuthors.current(), self.varYear.get(),
+                                   self.varIndex.get(), self.varPrice.get(), self.varQuantity.get(),
+                                   self.cbPublishers.current(), self.varHidden.get())
         if not new_book.equal(self.book):  # and self.book.title is None:
-            Core.update_books(new_book)
+            Operations.update_books(new_book)
             self.master.destroy()
         else:
             messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
@@ -160,7 +161,7 @@ class OperatorStorageFrame(Frame):
         self.cbTable.set(self.list_of_operator_tables[0])
         Button(self, text="Dodaj", command=self.btn_add).grid(row=0, column=2, sticky="ew")
         Button(self, text="Izmeni", command=self.btn_edit).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = Core.DataGridView(self, double_click=self.btn_edit)
+        self.DataGridView = GUI.DataGridView(self, double_click=self.btn_edit)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_cb_change()
 
@@ -184,23 +185,23 @@ class OperatorStorageFrame(Frame):
         pool = self.cbTable.get()
         data = []
         if pool == self.list_of_operator_tables[0]:  # knjige
-            data = Core.get_books(True, adv=True)
+            data = Operations.get_books(True, adv=True)
         if pool == self.list_of_operator_tables[1]:  # autori
-            data = Core.get_authors(True)
+            data = Operations.get_authors(True)
         if pool == self.list_of_operator_tables[2]:  # izdavaci
-            data = Core.get_publishers(True)
+            data = Operations.get_publishers(True)
         self.DataGridView.show_data(data)
 
     def dgv_double_click(self, index):
         pool = self.cbTable.get()
         if pool == self.list_of_operator_tables[0]:  # knjige
-            data = Core.get_books()[index]
+            data = Operations.get_books()[index]
             self.toplevel_edit(book=data)
         if pool == self.list_of_operator_tables[1]:  # autori
-            data = Core.get_authors()[index]
+            data = Operations.get_authors()[index]
             self.toplevel_edit(author=data)
         if pool == self.list_of_operator_tables[2]:  # izdavaci
-            data = Core.get_publishers()[index]
+            data = Operations.get_publishers()[index]
             self.toplevel_edit(publisher=data)
 
     def toplevel_edit(self, book=None, author=None, publisher=None):
@@ -213,12 +214,14 @@ class OperatorStorageFrame(Frame):
         elif publisher is not None:
             toplevel = Toplevel(self)
             EditPublisher(toplevel, publisher).pack()
+        else:
+            return
         toplevel.grab_set()
         self.wait_window(toplevel)
         self.tk_cb_change()
 
     def tk_add_book(self):
-        book = Core.get_new_book_id()
+        book = Operations.get_new_book_id()
         toplevel = Toplevel(self)
         EditBook(toplevel, book).pack()
         toplevel.grab_set()
@@ -227,7 +230,7 @@ class OperatorStorageFrame(Frame):
         pass
 
     def tk_add_publisher(self):
-        publisher = Core.get_new_publisher_id()
+        publisher = Operations.get_new_publisher_id()
         toplevel = Toplevel(self)
         EditPublisher(toplevel, publisher).pack()
         toplevel.grab_set()
@@ -236,7 +239,7 @@ class OperatorStorageFrame(Frame):
         pass
 
     def tk_add_author(self):
-        author = Core.get_new_author_id()
+        author = Operations.get_new_author_id()
         toplevel = Toplevel(self)
         EditAuthor(toplevel, author).pack()
         toplevel.grab_set()
@@ -264,12 +267,12 @@ class OperatorStatsFrame(Frame):
         Label(self, text=" Do:").grid(row=0, column=5)
         DatePicker(self, textvariable=self.to_date).grid(row=0, column=6)
         Button(self, text="Filtriraj", command=self.tk_filter).grid(row=0, column=7)
-        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView = GUI.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=9, sticky="nsew")
         self.tk_filter()
 
     def tk_filter(self):
-        data = Core.stats(self.from_date.get(), self.to_date.get(), self.date.get())
+        data = Operations.stats(self.from_date.get(), self.to_date.get(), self.date.get())
         self.DataGridView.show_data(data)
         pass
 
@@ -344,7 +347,7 @@ class OperatorReservationFrame(Frame):
         Frame.__init__(self, master)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(4, weight=1)
-        self.users = Core.get_users()
+        self.users = Operations.get_users()
         self.cb_users = Combobox(self, values=self.users, state="readonly")
         self.cb_users.bind("<<ComboboxSelected>>", self.tk_user_selected)
         self.cb_users.grid(row=0, column=0, sticky="ew")
@@ -352,13 +355,13 @@ class OperatorReservationFrame(Frame):
         Button(self, text="Ukloni", command=self.tk_remove).grid(row=0, column=1, sticky="ew")
         Button(self, text="Izmeni", command=self.tk_edit).grid(row=0, column=2, sticky="ew")
         Button(self, text="Dodaj", command=self.tk_add).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView = GUI.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_user_selected()
 
     def tk_user_selected(self, adg=None):
         user = self.users[self.cb_users.current()]
-        self.DataGridView.show_data(Core.reservations(user))
+        self.DataGridView.show_data(Operations.reservations(user))
 
     def tk_remove(self):
         user = self.users[self.cb_users.current()]
@@ -366,8 +369,8 @@ class OperatorReservationFrame(Frame):
         if index == -1:
             messagebox.showwarning("Upozorenje", "Niste izabrali red")
             return
-        row = Core.reservations(user, index)
-        Core.remove_reservation(user, row[1][0])
+        row = Operations.reservations(user, index)
+        Operations.remove_reservation(user, row[1][0])
         self.tk_user_selected()
 
     def tk_add(self):
@@ -380,7 +383,7 @@ class OperatorReservationFrame(Frame):
             messagebox.showwarning("Upozorenje", "Niste izabrali red")
             return
         user = self.users[self.cb_users.current()]
-        row = Core.reservations(user, index)
+        row = Operations.reservations(user, index)
         self.toplevel(user=user, book=row[1][0], quantity=row[1][2])
         pass
 
@@ -395,7 +398,7 @@ class OperatorReservationFrame(Frame):
 class EditReservation(Frame):
     def __init__(self, master=None, book=None, user=None, quantity=0):
         Frame.__init__(self, master)
-        self.books = Core.get_books()
+        self.books = Operations.get_books()
         self.book = book
         self.user = user
         self.quantity = quantity
@@ -421,10 +424,10 @@ class EditReservation(Frame):
     def tk_update(self):
         if self.varQuantity.get() > 0 and self.varQuantity.get() != self.quantity:
             if self.book is None:
-                if Core.add_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get()):
+                if Operations.add_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get()):
                     messagebox.showerror("Greška", "Rezervacija već postoji")
             else:
-                Core.edit_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get())
+                Operations.edit_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get())
             self.master.destroy()
         else:
             if self.varQuantity.get() == 0:

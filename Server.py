@@ -1,6 +1,6 @@
 from Models import *
 from tkinter import *
-from Core import *
+from GUI import *
 import sqlite3
 
 button_col = 0

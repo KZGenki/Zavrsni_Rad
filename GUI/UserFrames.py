@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
-import Core
+import GUI
+import Operations as Operations
 
 
 class CartFrame(LabelFrame):
@@ -68,8 +69,8 @@ class CartFrame(LabelFrame):
 
     def buy(self):
         if len(self.items) != 0:
-            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
-            Core.buy(cart, self.total())
+            cart = Operations.Cart(self.master.master.user, self.items, self.quantities)
+            Operations.buy(cart, self.total())
             self.load_reservation()
             self.master.search()
         else:
@@ -86,7 +87,7 @@ class CartFrame(LabelFrame):
             self.listbox.delete(index, index + 1)
             self.total()
             if len(self.items) == 0:
-                Core.save_cart(Core.Cart(self.master.master.user, [], []))
+                Operations.save_cart(Operations.Cart(self.master.master.user, [], []))
                 self.master.search()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
@@ -113,15 +114,15 @@ class CartFrame(LabelFrame):
 
     def reservation(self):
         if len(self.items) != 0:
-            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
-            Core.save_cart(cart)
+            cart = Operations.Cart(self.master.master.user, self.items, self.quantities)
+            Operations.save_cart(cart)
             self.master.search()
         else:
             messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
         pass
 
     def load_reservation(self):
-        cart = Core.list_cart(self.master.master.user)
+        cart = Operations.list_cart(self.master.master.user)
         self.items = cart.books
         self.quantities = cart.quantities
         self.listbox.delete(0, END)
@@ -162,7 +163,7 @@ class Workspace(Frame):
         # third row
         Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=5, sticky="ew")
         # fourth row, DataGridView
-        self.DataGridView = Core.DataGridView(self, double_click=self.add_to_cart)
+        self.DataGridView = GUI.DataGridView(self, double_click=self.add_to_cart)
         self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
         # right side
         self.cart = CartFrame(self)
@@ -170,16 +171,17 @@ class Workspace(Frame):
         self.search()
 
     def search(self):
-        data = Core.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(),
-                                                           self.varYear2.get(), self.varAuthor.get(),
-                                                           self.varTitle.get()))
+        data = Operations.get_list(self.master.user, Operations.Search(self.varSearch.get(), self.varYear.get(),
+                                                                       self.varYear2.get(), self.varAuthor.get(),
+                                                                       self.varTitle.get()))
         self.DataGridView.show_data(data)
         pass
 
     def add_to_cart(self, arg=None):
         index = self.DataGridView.index()
-        book = Core.get_book_from_search(Core.Search(self.varSearch.get(), self.varYear.get(), self.varYear2.get(),
-                                                     self.varAuthor.get(), self.varTitle.get()), index)
+        book = Operations.get_book_from_search(Operations.Search(self.varSearch.get(), self.varYear.get(),
+                                                                 self.varYear2.get(), self.varAuthor.get(),
+                                                                 self.varTitle.get()), index)
         if book.quantity >= 1:
             self.cart.add(book)
         pass

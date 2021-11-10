@@ -1,4 +1,4 @@
-from Core import *
+from GUI import *
 import sqlite3
 from tkinter import *
 from tkinter.ttk import *

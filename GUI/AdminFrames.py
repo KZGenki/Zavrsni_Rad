@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
 import sqlite3
-import Core
+import GUI
+import Operations
 
 
 class AdminMainFrame(Frame):
@@ -20,14 +21,14 @@ class AdminMainFrame(Frame):
         self.btn_advanced = Button(self.master.top_row, text="Napredno", command=self.tk_advanced)
         self.btn_advanced.grid(row=0, column=3, sticky="e")
 
-        self.working_frame = Frame(self)  # Core.Workspace(self)
+        self.working_frame = Frame(self)  # GUI.Workspace(self)
         # self.working_frame.grid(row=1, column=0, sticky="nsew")
         self.tk_admin()
 
     def tk_user(self):
         if self.btn_user["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = Core.Workspace(self)
+            self.working_frame = GUI.Workspace(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_user["relief"] = SUNKEN
@@ -35,7 +36,7 @@ class AdminMainFrame(Frame):
     def tk_advanced(self):
         if self.btn_advanced["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = Core.AdvancedFrame(self)
+            self.working_frame = GUI.AdvancedFrame(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_advanced["relief"] = SUNKEN
@@ -43,7 +44,7 @@ class AdminMainFrame(Frame):
     def tk_operator(self):
         if self.btn_operator["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = Core.OperatorFrame(self)
+            self.working_frame = GUI.OperatorFrame(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_operator["relief"] = SUNKEN
@@ -72,7 +73,7 @@ class AdvancedFrame(Frame):
         self.varQuery = StringVar()
         Entry(self, textvariable=self.varQuery, width=40).grid(row=0, column=1, sticky="ew")
         Button(self, text="Execute", command=self.query).grid(row=0, column=2, sticky="e")
-        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView = GUI.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
         self.varError = StringVar()
         Label(self, textvariable=self.varError).grid(row=2, column=0, columnspan=3, sticky="w")
@@ -83,7 +84,7 @@ class AdvancedFrame(Frame):
         else:
             query = self.varQuery.get()
         try:
-            data = Core.exec_query(query)
+            data = Operations.exec_query(query)
         except sqlite3.Error as e:
             self.varError.set(str(e))
         else:
@@ -115,7 +116,7 @@ class EditUserFrame(Frame):
         Entry(self, textvariable=self.varPassword).grid(row=1, column=1, sticky="ew")
         Label(self, text="Tip: ").grid(row=2, column=0, sticky="e")
         sb = Spinbox(self, textvariable=self.varType, from_=0, to=3,
-                     command=lambda: self.varT.set(Core.user_types[self.varType.get()]))
+                     command=lambda: self.varT.set(Operations.user_types[self.varType.get()]))
         sb.grid(row=2, column=1, sticky="ew")
         Label(self, textvariable=self.varT).grid(row=3, column=0, columnspan=2, sticky="ew")
         Button(self, text="Ažuriraj", command=self.tk_update_user).grid(row=4, column=0, columnspan=2, sticky="ew")
@@ -124,29 +125,29 @@ class EditUserFrame(Frame):
             self.varUsername.set(self.user.username)
             self.varPassword.set(self.user.password)
             self.varType.set(self.user.type)
-            self.varT.set(Core.user_types[self.user.type])
+            self.varT.set(Operations.user_types[self.user.type])
             if self.user.type == 3:
                 if self.user.username == self.master.master.master.master.user.username:
                     sb["state"] = DISABLED
         else:
             usr["state"] = NORMAL
             self.varType.set(1)
-            self.varT.set(Core.user_types[1])
+            self.varT.set(Operations.user_types[1])
 
     def tk_update_user(self):
         if self.user is not None:
-            new_user_data = Core.User(self.user.username, self.varPassword.get(), self.varType.get())
+            new_user_data = Operations.User(self.user.username, self.varPassword.get(), self.varType.get())
             if new_user_data.password != self.user.password or new_user_data.type != self.user.type:
-                Core.update_user(new_user_data)
+                Operations.update_user(new_user_data)
                 self.master.master.tk_get_users()
                 self.master.destroy()
             else:
                 messagebox.showinfo("Obaveštenje", "Nisu izmenjeni podaci, neće biti izvršeno ažuriranje")
         else:
-            new_user_data = Core.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
+            new_user_data = Operations.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
             if new_user_data.password != "" and new_user_data.username != "":
                 try:
-                    Core.new_user2(new_user_data)
+                    Operations.new_user2(new_user_data)
                 except sqlite3.IntegrityError:
                     messagebox.showerror("Greška", "Postoji korisnik sa istim korisničkim imenom")
                 else:
@@ -174,7 +175,7 @@ class ListUsersFrame(LabelFrame):
 
     def tk_get_users(self):
         self.lb_users.delete(0, END)
-        self.users = Core.get_users()
+        self.users = Operations.get_users()
         for user in self.users:
             self.lb_users.insert(END, user)
         pass
