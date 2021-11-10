@@ -156,11 +156,11 @@ def exec_query(query, params=None):
 
 def get_list(user, search_object: Search):
     query = "SELECT naslov AS 'Naslov', godina_izdanja AS 'Godina izdanja', (ime || ' ' || prezime) AS 'Autor', naziv" \
-            " AS 'Izdavac', (kolicina_na_stanju - sum(kolicina)) as Raspolozivo FROM knjige " \
+            " AS 'Izdavač', (kolicina_na_stanju - SUM(kolicina)) as Raspoloživo FROM knjige " \
             "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
             "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca " \
             "INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige WHERE deleted = 0 " \
-            "GROUP BY knjige.id_knjige HAVING Raspolozivo > 0"
+            "GROUP BY knjige.id_knjige HAVING Raspoloživo > 0"
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
         query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
