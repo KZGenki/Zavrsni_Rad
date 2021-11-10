@@ -29,7 +29,7 @@ class MainFrame(Frame):
         self.workspace.grid(row=1, column=0, columnspan=3, sticky="nsew")
 
     def login_screen(self):
-        Operations.clear_master(self.master)
+        GUI.clear_master(self.master)
         LoginFrame(self.master).grid()
         pass
 
@@ -86,7 +86,7 @@ class LoginFrame(Frame):
             self.main_frame(result)
 
     def main_frame(self, result):
-        Operations.clear_master(self.master)
+        GUI.clear_master(self.master)
         MainFrame(self.master, user=result).grid(sticky="nsew")
 
     def tk_check_user_pass(self):

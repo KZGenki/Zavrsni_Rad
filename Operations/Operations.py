@@ -82,12 +82,6 @@ class Cart:
         self.quantities = quantities
 
 
-def clear_master(master):
-    slaves = master.grid_slaves()
-    for slave in slaves:
-        slave.destroy()
-
-
 def login(username="Guest", password="Guest"):
     conn = sqlite3.connect("knjizara.db")
     cursor = conn.execute("SELECT * FROM korisnici WHERE korisnik=?", (username,))
