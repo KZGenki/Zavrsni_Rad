@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
-import GUI
-import Operations as Operations
+import Core
+# import Operations
+import Client as Operations
 
 
 class CartFrame(LabelFrame):
@@ -163,7 +164,7 @@ class Workspace(Frame):
         # third row
         Button(self, text="Smesti u korpu", command=self.add_to_cart).grid(row=2, column=0, columnspan=5, sticky="ew")
         # fourth row, DataGridView
-        self.DataGridView = GUI.DataGridView(self, double_click=self.add_to_cart)
+        self.DataGridView = Core.DataGridView(self, double_click=self.add_to_cart)
         self.DataGridView.grid(row=3, column=0, columnspan=5, sticky="nsew")
         # right side
         self.cart = CartFrame(self)
@@ -171,17 +172,17 @@ class Workspace(Frame):
         self.search()
 
     def search(self):
-        data = Operations.get_list(self.master.user, Operations.Search(self.varSearch.get(), self.varYear.get(),
-                                                                       self.varYear2.get(), self.varAuthor.get(),
-                                                                       self.varTitle.get()))
+        data = Operations.get_list(self.master.user, Core.Search(self.varSearch.get(), self.varYear.get(),
+                                                                 self.varYear2.get(), self.varAuthor.get(),
+                                                                 self.varTitle.get()))
         self.DataGridView.show_data(data)
         pass
 
     def add_to_cart(self, arg=None):
         index = self.DataGridView.index()
-        book = Operations.get_book_from_search(Operations.Search(self.varSearch.get(), self.varYear.get(),
-                                                                 self.varYear2.get(), self.varAuthor.get(),
-                                                                 self.varTitle.get()), index)
+        book = Operations.get_book_from_search(Core.Search(self.varSearch.get(), self.varYear.get(),
+                                                           self.varYear2.get(), self.varAuthor.get(),
+                                                           self.varTitle.get()), index)
         if book.quantity >= 1:
             self.cart.add(book)
         pass

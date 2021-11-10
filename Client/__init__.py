@@ -1,2 +1,2 @@
-from .Client import *
+from .ClientData import *
 from .ClientOperations import *

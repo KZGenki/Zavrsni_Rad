@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
 import sqlite3
-import GUI
-import Operations
+import Core
+# import Operations
+import Client as Operations
 
 
 class AdminMainFrame(Frame):
@@ -21,14 +22,14 @@ class AdminMainFrame(Frame):
         self.btn_advanced = Button(self.master.top_row, text="Napredno", command=self.tk_advanced)
         self.btn_advanced.grid(row=0, column=3, sticky="e")
 
-        self.working_frame = Frame(self)  # GUI.Workspace(self)
+        self.working_frame = Frame(self)  # Core.Workspace(self)
         # self.working_frame.grid(row=1, column=0, sticky="nsew")
         self.tk_admin()
 
     def tk_user(self):
         if self.btn_user["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = GUI.Workspace(self)
+            self.working_frame = Core.Workspace(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_user["relief"] = SUNKEN
@@ -36,7 +37,7 @@ class AdminMainFrame(Frame):
     def tk_advanced(self):
         if self.btn_advanced["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = GUI.AdvancedFrame(self)
+            self.working_frame = Core.AdvancedFrame(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_advanced["relief"] = SUNKEN
@@ -44,7 +45,7 @@ class AdminMainFrame(Frame):
     def tk_operator(self):
         if self.btn_operator["relief"] != SUNKEN:
             self.working_frame.destroy()
-            self.working_frame = GUI.OperatorFrame(self)
+            self.working_frame = Core.OperatorFrame(self)
             self.working_frame.grid(row=1, column=0, sticky="nsew")
             self.raise_buttons()
             self.btn_operator["relief"] = SUNKEN
@@ -73,7 +74,7 @@ class AdvancedFrame(Frame):
         self.varQuery = StringVar()
         Entry(self, textvariable=self.varQuery, width=40).grid(row=0, column=1, sticky="ew")
         Button(self, text="Execute", command=self.query).grid(row=0, column=2, sticky="e")
-        self.DataGridView = GUI.DataGridView(self)
+        self.DataGridView = Core.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=3, sticky="nsew")
         self.varError = StringVar()
         Label(self, textvariable=self.varError).grid(row=2, column=0, columnspan=3, sticky="w")

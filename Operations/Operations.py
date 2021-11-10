@@ -1,10 +1,11 @@
 import sqlite3
-import GUI
+import Core
 from datetime import datetime
 
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
 
+database = "../knjizara.db"
 
 def now():
     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -83,18 +84,18 @@ class Cart:
 
 
 def login(username="Guest", password="Guest"):
-    conn = sqlite3.connect("knjizara.db")
+    conn = sqlite3.connect(database)
     cursor = conn.execute("SELECT * FROM korisnici WHERE korisnik=?", (username,))
     data = []
     for col in cursor:
         data.append(col)
     conn.close()
     if len(data) != 1:
-        raise GUI.LoginError("Korisnik ne postoji, proveri korisničko ime")
+        raise Core.LoginError("Korisnik ne postoji, proveri korisničko ime")
     if len(data[0]) == 3:
         if data[0][0] == username and data[0][1] == password:
             return User(username, password, data[0][2])
-    raise GUI.LoginError("Lozinka se ne poklapa, proveri lozinku")
+    raise Core.LoginError("Lozinka se ne poklapa, proveri lozinku")
 
 
 def new_user(username, password):
@@ -105,7 +106,7 @@ def new_user(username, password):
         data.append(col)
     if len(data) != 0:
         conn.close()
-        raise GUI.LoginError("Korisničko ime je zauzeto, unesite drugo ime")
+        raise Core.LoginError("Korisničko ime je zauzeto, unesite drugo ime")
     cursor.execute("INSERT INTO korisnici (korisnik, password, type) VALUES(?, ?, 1)", (username, password))
     conn.commit()
     cursor.execute("SELECT * FROM korisnici WHERE korisnik=? AND password =?", (username, password))
@@ -115,15 +116,15 @@ def new_user(username, password):
     conn.commit()
     conn.close()
     if len(data) != 1:
-        raise GUI.LoginError("Greška u bazi, nalog nije napravljen")
+        raise Core.LoginError("Greška u bazi, nalog nije napravljen")
     if len(data[0]) == 3:
         if data[0][0] == username and data[0][1] == password:
             return User(username, password, data[0][2])
-    raise GUI.LoginError("Greška u bazi, nalog je neispravan")
+    raise Core.LoginError("Greška u bazi, nalog je neispravan")
 
 
 def exec_query(query, params=None):
-    conn = sqlite3.connect("knjizara.db")
+    conn = sqlite3.connect(database)
     if params is None:
         cursor = conn.execute(query)
     else:

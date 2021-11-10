@@ -8,16 +8,27 @@ class ClientData:
         self.port = port
         self.socket = None
 
-    def get_data(self):
+    def wait_for_connect(self):
         self.socket = socket.socket()
         self.socket.connect((self.addr, self.port))
-        raw_data = self.socket.recv(4096)
+        return True
+
+    def get_data(self):
+        raw_data = self.socket.recv(20000)
         data = pickle.loads(raw_data)
-        self.socket.close()
         return data
 
     def send_data(self, data):
+        self.socket.send(pickle.dumps(data))
+
+    def close(self):
+        self.socket.close()
+
+    def send_receive(self, data):
         self.socket = socket.socket()
         self.socket.connect((self.addr, self.port))
         self.socket.send(pickle.dumps(data))
+        raw_data = self.socket.recv(20000)
+        data = pickle.loads(raw_data)
+        return data
         self.socket.close()

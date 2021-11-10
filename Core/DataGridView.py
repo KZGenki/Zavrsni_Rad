@@ -1,4 +1,4 @@
-import GUI
+import Core
 from tkinter import *
 
 
@@ -39,7 +39,7 @@ class DataGridView(Frame):
         pass
 
     def show_data(self, sql_data):
-        GUI.clear_master(self.tray)
+        Core.clear_master(self.tray)
         self.data = sql_data
         self.lb_group = []
         self.btn_group = []

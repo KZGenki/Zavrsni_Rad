@@ -1,5 +1,6 @@
-from GUI import *
-import Operations
+from Core import *
+# import Operations
+import Client as Operations
 
 
 class MainFrame(Frame):
@@ -21,15 +22,15 @@ class MainFrame(Frame):
         self.lblMessage.grid(row=0, column=1, sticky="w")
         self.top_row.grid(row=0, column=2, sticky="ew")
         if self.user.type == 3:
-            self.workspace = GUI.AdminMainFrame(self, user)
+            self.workspace = Core.AdminMainFrame(self, user)
         elif self.user.type == 2:
-            self.workspace = GUI.OperatorFrame(self)
+            self.workspace = Core.OperatorFrame(self)
         else:
             self.workspace = Workspace(self)
         self.workspace.grid(row=1, column=0, columnspan=3, sticky="nsew")
 
     def login_screen(self):
-        GUI.clear_master(self.master)
+        Core.clear_master(self.master)
         LoginFrame(self.master).grid()
         pass
 
@@ -63,7 +64,7 @@ class LoginFrame(Frame):
         try:
             self.tk_check_user_pass()
             result = Operations.login(self.varUsername.get(), self.varPassword.get())
-        except GUI.LoginError as e:
+        except Core.LoginError as e:
             self.tk_error_label(e)
         else:
             self.main_frame(result)
@@ -72,7 +73,7 @@ class LoginFrame(Frame):
         try:
             self.tk_check_user_pass()
             result = Operations.new_user(self.varUsername.get(), self.varPassword.get())
-        except GUI.LoginError as e:
+        except Core.LoginError as e:
             self.tk_error_label(e)
         else:
             self.main_frame(result)
@@ -80,20 +81,20 @@ class LoginFrame(Frame):
     def tk_guest(self):
         try:
             result = Operations.login()
-        except GUI.LoginError as e:
+        except Core.LoginError as e:
             self.tk_error_label(e)
         else:
             self.main_frame(result)
 
     def main_frame(self, result):
-        GUI.clear_master(self.master)
+        Core.clear_master(self.master)
         MainFrame(self.master, user=result).grid(sticky="nsew")
 
     def tk_check_user_pass(self):
         if self.varUsername.get() == "":
-            raise GUI.LoginError("Korisničko polje ne sme biti prazno")
+            raise Core.LoginError("Korisničko polje ne sme biti prazno")
         if self.varPassword.get() == "":
-            raise GUI.LoginError("Polje za lozinku ne sme biti prazno")
+            raise Core.LoginError("Polje za lozinku ne sme biti prazno")
 
     def tk_error_label(self, message):
         self.errLbl.destroy()

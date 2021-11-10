@@ -1,3 +1,2 @@
 from .ServerOperations import *
-from .Server import *
-from .Main import *
+from .ServerData import *

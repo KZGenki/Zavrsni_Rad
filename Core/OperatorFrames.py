@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import Combobox
-import GUI
-import Operations
+import Core
+# import Operations
+import Client as Operations
 
 
 class OperatorFrame(Frame):
@@ -161,7 +162,7 @@ class OperatorStorageFrame(Frame):
         self.cbTable.set(self.list_of_operator_tables[0])
         Button(self, text="Dodaj", command=self.btn_add).grid(row=0, column=2, sticky="ew")
         Button(self, text="Izmeni", command=self.btn_edit).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = GUI.DataGridView(self, double_click=self.btn_edit)
+        self.DataGridView = Core.DataGridView(self, double_click=self.btn_edit)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_cb_change()
 
@@ -267,7 +268,7 @@ class OperatorStatsFrame(Frame):
         Label(self, text=" Do:").grid(row=0, column=5)
         DatePicker(self, textvariable=self.to_date).grid(row=0, column=6)
         Button(self, text="Filtriraj", command=self.tk_filter).grid(row=0, column=7)
-        self.DataGridView = GUI.DataGridView(self)
+        self.DataGridView = Core.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=9, sticky="nsew")
         self.tk_filter()
 
@@ -355,7 +356,7 @@ class OperatorReservationFrame(Frame):
         Button(self, text="Ukloni", command=self.tk_remove).grid(row=0, column=1, sticky="ew")
         Button(self, text="Izmeni", command=self.tk_edit).grid(row=0, column=2, sticky="ew")
         Button(self, text="Dodaj", command=self.tk_add).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = GUI.DataGridView(self)
+        self.DataGridView = Core.DataGridView(self)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_user_selected()
 
