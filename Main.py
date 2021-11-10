@@ -13,10 +13,10 @@ class MainFrame(Frame):
         self.top_row = Frame(self)
         if self.user.type == 0:
             self.btnLogout = Button(self, text="Nazad", command=self.login_screen)
-            self.lblMessage = Label(self, text="Dobrodosli")
+            self.lblMessage = Label(self, text="Dobrodošli")
         else:
             self.btnLogout = Button(self, text="Odjava", command=self.login_screen)
-            self.lblMessage = Label(self, text="Dobrodosli, " + self.user.username)
+            self.lblMessage = Label(self, text="Dobrodošli, " + self.user.username)
         self.btnLogout.grid(row=0, column=0, sticky="w")
         self.lblMessage.grid(row=0, column=1, sticky="w")
         self.top_row.grid(row=0, column=2, sticky="ew")
@@ -40,7 +40,7 @@ class LoginFrame(Frame):
         self.errLbl = Label(self)
         # self.grid()
         # username
-        self.lblUsername = Label(self, text="Korisnicko ime")
+        self.lblUsername = Label(self, text="Korisničko ime")
         self.lblUsername.grid(row=0, column=0)
         self.varUsername = StringVar()
         self.entUsername = Entry(self, textvariable=self.varUsername)
@@ -91,7 +91,7 @@ class LoginFrame(Frame):
 
     def tk_check_user_pass(self):
         if self.varUsername.get() == "":
-            raise Core.LoginError("Korisnicko polje ne sme biti prazno")
+            raise Core.LoginError("Korisničko polje ne sme biti prazno")
         if self.varPassword.get() == "":
             raise Core.LoginError("Polje za lozinku ne sme biti prazno")
 
@@ -103,7 +103,7 @@ class LoginFrame(Frame):
 
 if __name__ == '__main__':
     MainWindow = Tk()
-    MainWindow.wm_title("Knjizara")
+    MainWindow.wm_title("Knjižara")
     MainWindow.rowconfigure(0, weight=1)
     MainWindow.columnconfigure(0, weight=1)
     LoginFrame(MainWindow).grid(row=0, column=0, sticky="nsew")

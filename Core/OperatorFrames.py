@@ -9,7 +9,7 @@ class OperatorFrame(Frame):
         Frame.__init__(self, master)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(4, weight=1)
-        self.btn_store = Button(self, text="Knjizara", command=self.tk_store, relief=SUNKEN)
+        self.btn_store = Button(self, text="Knjižara", command=self.tk_store, relief=SUNKEN)
         self.btn_store.grid(row=0, column=0, sticky="ew")
         self.btn_stats = Button(self, text="Statistika", command=self.tk_stats)
         self.btn_stats.grid(row=0, column=1, sticky="ew")
@@ -55,7 +55,7 @@ class EditPublisher(Frame):
         Label(self, text="Ime:").grid(row=0, column=0, sticky="e")
         self.varName = StringVar()
         Entry(self, textvariable=self.varName).grid(row=0, column=1, sticky="ew")
-        Button(self, text="Azuriraj", command=self.tk_update_publisher).grid(row=1, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Ažuriraj", command=self.tk_update_publisher).grid(row=1, column=0, columnspan=2, sticky="ew")
         if self.publisher is not None:
             self.varName.set(self.publisher.name)
 
@@ -65,7 +65,7 @@ class EditPublisher(Frame):
             Core.update_publishers(publisher)
             self.master.destroy()
         else:
-            messagebox.showinfo("Obavestenje", "Nisu uneti novi podaci, nece biti izvrseno azuriranje")
+            messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
 
 
 class EditAuthor(Frame):
@@ -78,7 +78,7 @@ class EditAuthor(Frame):
         Label(self, text="Prezime: ").grid(row=1, column=0, sticky="e")
         self.varSurname = StringVar()
         Entry(self, textvariable=self.varSurname).grid(row=1, column=1, sticky="ew")
-        Button(self, text="Azuriraj", command=self.tk_update_author).grid(row=2, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Ažuriraj", command=self.tk_update_author).grid(row=2, column=0, columnspan=2, sticky="ew")
         if self.author is None:
             self.author = Core.Author(0, "", "")
         self.varName.set(self.author.name)
@@ -90,7 +90,7 @@ class EditAuthor(Frame):
             Core.update_authors(author)
             self.master.destroy()
         else:
-            messagebox.showinfo("Obavestenje", "Nisu uneti novi podaci, nece biti izvrseno azuriranje")
+            messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
         pass
 
 
@@ -117,14 +117,14 @@ class EditBook(Frame):
         Entry(self, textvariable=self.varIndex).grid(row=3, column=1, sticky="ew")
         Label(self, text="Cena: ").grid(row=4, column=0, sticky="e")
         Entry(self, textvariable=self.varPrice).grid(row=4, column=1, sticky="ew")
-        Label(self, text="Kolicina na stanju").grid(row=5, column=0, sticky="e")
+        Label(self, text="Količina na stanju").grid(row=5, column=0, sticky="e")
         Spinbox(self, textvariable=self.varQuantity, from_=0, to=10000).grid(row=5, column=1, sticky="ew")
-        Label(self, text="Izdavac: ").grid(row=6, column=0, sticky="e")
+        Label(self, text="Izdavač: ").grid(row=6, column=0, sticky="e")
         self.cbPublishers = Combobox(self, state="readonly", values=self.list_of_publishers)
         self.cbPublishers.grid(row=6, column=1, sticky="ew")
         Label(self, text="Sakriven: ").grid(row=7, column=0, sticky="e")
         Checkbutton(self, variable=self.varHidden, onvalue=1, offvalue=0).grid(row=7, column=1, sticky="w")
-        Button(self, text="Azuriraj", command=self.tk_update_book).grid(row=8, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Ažuriraj", command=self.tk_update_book).grid(row=8, column=0, columnspan=2, sticky="ew")
         if self.book is not None:
             self.varTitle.set(self.book.title)
             self.varYear.set(self.book.year)
@@ -143,7 +143,7 @@ class EditBook(Frame):
             Core.update_books(new_book)
             self.master.destroy()
         else:
-            messagebox.showinfo("Obavestenje", "Nisu uneti novi podaci, nece biti izvrseno azuriranje")
+            messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
         pass
 
 
@@ -152,7 +152,7 @@ class OperatorStorageFrame(Frame):
         Frame.__init__(self, master)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(4, weight=1)
-        self.list_of_operator_tables = ['knjige', 'autori', 'izdavaci']
+        self.list_of_operator_tables = ['knjige', 'autori', 'izdavači']
         Label(self, text="Tabela:").grid(row=0, column=0, sticky="e")
         self.cbTable = Combobox(self, state="readonly", values=self.list_of_operator_tables)
         self.cbTable.bind("<<ComboboxSelected>>", self.tk_cb_change)
@@ -407,11 +407,11 @@ class EditReservation(Frame):
         self.varUser = StringVar()
         self.varUser.set(user.username)
         Entry(self, textvariable=self.varUser, state=DISABLED).grid(row=1, column=1, sticky="ew")
-        Label(self, text="Kolicina").grid(row=2, column=0, sticky="e")
+        Label(self, text="Količina").grid(row=2, column=0, sticky="e")
         self.varQuantity = IntVar()
         self.varQuantity.set(self.quantity)
         Spinbox(self, textvariable=self.varQuantity, from_=0, to=10000).grid(row=2, column=1, sticky="ew")
-        Button(self, text="Azuriraj", command=self.tk_update).grid(row=3, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Ažuriraj", command=self.tk_update).grid(row=3, column=0, columnspan=2, sticky="ew")
 
     def book_index_to_book(self):
         for i in range(len(self.books)):
@@ -422,12 +422,12 @@ class EditReservation(Frame):
         if self.varQuantity.get() > 0 and self.varQuantity.get() != self.quantity:
             if self.book is None:
                 if Core.add_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get()):
-                    messagebox.showerror("Greska", "Rezervacija vec postoji")
+                    messagebox.showerror("Greška", "Rezervacija već postoji")
             else:
                 Core.edit_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get())
             self.master.destroy()
         else:
             if self.varQuantity.get() == 0:
-                messagebox.showwarning("Upozorenje", "Kolicina mora biti veca od 0")
+                messagebox.showwarning("Upozorenje", "Količina mora biti veća od 0")
             else:
-                messagebox.showwarning("Upozorenje", "Kolicina nije promenjena")
+                messagebox.showwarning("Upozorenje", "Količina nije promenjena")

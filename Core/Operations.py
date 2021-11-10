@@ -90,13 +90,13 @@ def clear_master(master):
 
 def login(username="Guest", password="Guest"):
     conn = sqlite3.connect("knjizara.db")
-    cursor = conn.execute("select * from korisnici where korisnik=?", (username,))
+    cursor = conn.execute("SELECT * FROM korisnici WHERE korisnik=?", (username,))
     data = []
     for col in cursor:
         data.append(col)
     conn.close()
     if len(data) != 1:
-        raise Core.LoginError("Korisnik ne postoji, proveri korisnicko ime")
+        raise Core.LoginError("Korisnik ne postoji, proveri korisničko ime")
     if len(data[0]) == 3:
         if data[0][0] == username and data[0][1] == password:
             return User(username, password, data[0][2])
@@ -105,27 +105,27 @@ def login(username="Guest", password="Guest"):
 
 def new_user(username, password):
     conn = sqlite3.connect("knjizara.db")
-    cursor = conn.execute("select korisnik from korisnici where korisnik=?", (username,))
+    cursor = conn.execute("SELECT korisnik FROM korisnici WHERE korisnik=?", (username,))
     data = []
     for col in cursor:
         data.append(col)
     if len(data) != 0:
         conn.close()
-        raise Core.LoginError("Korisnicko ime je zauzeto, unesite drugo ime")
-    cursor.execute("insert into korisnici (korisnik, password, type) values(?, ?, 1)", (username, password))
+        raise Core.LoginError("Korisničko ime je zauzeto, unesite drugo ime")
+    cursor.execute("INSERT INTO korisnici (korisnik, password, type) VALUES(?, ?, 1)", (username, password))
     conn.commit()
-    cursor.execute("select * from korisnici where korisnik=? and password =?", (username, password))
+    cursor.execute("SELECT * FROM korisnici WHERE korisnik=? AND password =?", (username, password))
     data = []
     for col in cursor:
         data.append(col)
     conn.commit()
     conn.close()
     if len(data) != 1:
-        raise Core.LoginError("Greska u bazi, nalog nije napravljen")
+        raise Core.LoginError("Greška u bazi, nalog nije napravljen")
     if len(data[0]) == 3:
         if data[0][0] == username and data[0][1] == password:
             return User(username, password, data[0][2])
-    raise Core.LoginError("Greska u bazi, nalog je neispravan")
+    raise Core.LoginError("Greška u bazi, nalog je neispravan")
 
 
 def exec_query(query, params=None):
@@ -296,7 +296,7 @@ def update_authors(author):
 
 
 def get_new_author_id():
-    data = exec_query("select MAX(id_autora) from autori")
+    data = exec_query("SELECT MAX(id_autora) FROM autori")
     if data[1][0] is None:
         author = Author(0)
     else:
@@ -305,7 +305,7 @@ def get_new_author_id():
 
 
 def get_authors(raw_data=None):
-    data = exec_query("select * from autori")
+    data = exec_query("SELECT * FROM autori")
     if raw_data:
         return data
     authors = []
@@ -315,7 +315,7 @@ def get_authors(raw_data=None):
 
 
 def get_new_publisher_id():
-    data = exec_query("select MAX(id_izdavaca) from izdavaci")
+    data = exec_query("SELECT MAX(id_izdavaca) FROM izdavaci")
     if data[1][0] is None:
         publisher = Publisher(0)
     else:
@@ -332,7 +332,7 @@ def update_publishers(publisher):
 
 
 def get_publishers(raw_data=None):
-    data = exec_query("select * from izdavaci")
+    data = exec_query("SELECT * FROM izdavaci")
     if raw_data:
         return data
     publishers = []
@@ -342,7 +342,7 @@ def get_publishers(raw_data=None):
 
 
 def get_new_book_id():
-    data = exec_query("select MAX(id_knjige) from knjige")
+    data = exec_query("SELECT MAX(id_knjige) FROM knjige")
     if data[1][0] is None:
         book = Book(0)
     else:
@@ -352,17 +352,17 @@ def get_new_book_id():
 
 def get_books(raw_data=None, adv=None, restricted=None):
     if restricted is not None:
-        data = exec_query("select knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
-                          "(kolicina_na_stanju - sum(kolicina)) as raspolozivo , id_izdavaca, deleted "
-                          "from knjige inner join rezervacije on knjige.id_knjige = rezervacije.id_knjige "
-                          "group by knjige.id_knjige")
+        data = exec_query("SELECT knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
+                          "(kolicina_na_stanju - SUM(kolicina)) AS raspoloživo , id_izdavaca, deleted "
+                          "FROM knjige INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige "
+                          "GROUP BY knjige.id_knjige")
     elif adv is not None:
-        data = exec_query("select knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, kolicina_na_stanju"
-                          ", (kolicina_na_stanju - sum(kolicina)) as raspolozivo , id_izdavaca, deleted "
-                          "from knjige inner join rezervacije on knjige.id_knjige = rezervacije.id_knjige "
-                          "group by knjige.id_knjige")
+        data = exec_query("SELECT knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, kolicina_na_stanju"
+                          ", (kolicina_na_stanju - SUM(kolicina)) AS raspoloživo , id_izdavaca, deleted "
+                          "FROM knjige INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige "
+                          "GROUP BY knjige.id_knjige")
     else:
-        data = exec_query("select * from knjige")
+        data = exec_query("SELECT * FROM knjige")
     if raw_data:
         return data
     books = []

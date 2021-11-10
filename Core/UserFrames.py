@@ -20,7 +20,7 @@ class CartFrame(LabelFrame):
         self.btn_remove.grid(row=1, column=0, sticky="ew")
         self.btn_remove_one = Button(self, text="Ukloni jedan", command=self.remove_one)
         self.btn_remove_one.grid(row=1, column=1, sticky="ew")
-        self.lbl_text = Label(self, text="Racun:")
+        self.lbl_text = Label(self, text="Račun:")
         self.lbl_text.grid(row=2, column=0, sticky="w")
         self.var_total = StringVar()
         self.var_total.set("0.0 Din")
@@ -30,7 +30,7 @@ class CartFrame(LabelFrame):
         self.line.grid(row=3, column=0, columnspan=2, padx=5, pady=(0, 5), sticky="ew")
         self.btn_buy = Button(self, text="Kupi", command=self.buy)
         if self.master.master.user.type != 0:
-            self.btn_reservation = Button(self, text="Rezervisi", command=self.reservation)
+            self.btn_reservation = Button(self, text="Rezerviši", command=self.reservation)
             self.btn_reservation.grid(row=4, column=0, sticky="ew")
             self.btn_buy.grid(row=4, column=1, sticky="ew")
             self.load_reservation()
@@ -51,7 +51,7 @@ class CartFrame(LabelFrame):
                                 str(book.price * self.quantities[index])+" Din")
         else:
             if self.quantities[i] + 1 > self.items[i].quantity:
-                messagebox.showwarning("Upozorenje", "Dostignuta je maksimalna dostupna kolicina")
+                messagebox.showwarning("Upozorenje", "Dostignuta je maksimalna dostupna količina")
                 return
             self.quantities[i] += 1
             self.listbox.delete(index * 2 + 1)
@@ -141,7 +141,7 @@ class Workspace(Frame):
         self.rowconfigure(2, weight=0)
         self.rowconfigure(3, weight=1)
         # first row
-        Label(self, text="Pretrazi:").grid(row=0, column=0)
+        Label(self, text="Pretraži:").grid(row=0, column=0)
         self.varSearch = StringVar()
         Entry(self, textvariable=self.varSearch, width=70).grid(row=0, column=1, sticky="ew")
         Label(self, text="Godina:").grid(row=0, column=2)
@@ -151,7 +151,7 @@ class Workspace(Frame):
         Button(self, text="Pretraga", command=self.search).grid(row=0, column=4)
         # second row
         row = Frame(self)
-        Label(row, text="Pretrazi po: ").grid(row=1, column=0)
+        Label(row, text="Pretraži po: ").grid(row=1, column=0)
         self.varAuthor = IntVar()
         Checkbutton(row, text="autoru", variable=self.varAuthor, onvalue=1, offvalue=0).grid(row=1, column=1)
         self.varTitle = IntVar()

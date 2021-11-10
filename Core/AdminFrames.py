@@ -79,7 +79,7 @@ class AdvancedFrame(Frame):
 
     def query(self):
         if self.varQuery.get() == "":
-            query = "select name as Tabele from sqlite_master where type='table' and name not like 'sqlite_%';"
+            query = "SELECT name AS Tabele FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';"
         else:
             query = self.varQuery.get()
         try:
@@ -108,7 +108,7 @@ class EditUserFrame(Frame):
         self.varType = IntVar()
         self.varT = StringVar()
 
-        Label(self, text="Korisnicko ime: ").grid(row=0, column=0, sticky="e")
+        Label(self, text="Korisničko ime: ").grid(row=0, column=0, sticky="e")
         usr = Entry(self, textvariable=self.varUsername, state=DISABLED)
         usr.grid(row=0, column=1, sticky="ew")
         Label(self, text="Lozinka: ").grid(row=1, column=0, sticky="e")
@@ -118,7 +118,7 @@ class EditUserFrame(Frame):
                      command=lambda: self.varT.set(Core.user_types[self.varType.get()]))
         sb.grid(row=2, column=1, sticky="ew")
         Label(self, textvariable=self.varT).grid(row=3, column=0, columnspan=2, sticky="ew")
-        Button(self, text="Azuriraj", command=self.tk_update_user).grid(row=4, column=0, columnspan=2, sticky="ew")
+        Button(self, text="Ažuriraj", command=self.tk_update_user).grid(row=4, column=0, columnspan=2, sticky="ew")
         # if editing existing user or creating new user
         if self.user is not None:
             self.varUsername.set(self.user.username)
@@ -141,19 +141,19 @@ class EditUserFrame(Frame):
                 self.master.master.tk_get_users()
                 self.master.destroy()
             else:
-                messagebox.showinfo("Obavestenje", "Nisu izmenjeni podaci, nece biti izvrseno azuriranje")
+                messagebox.showinfo("Obaveštenje", "Nisu izmenjeni podaci, neće biti izvršeno ažuriranje")
         else:
             new_user_data = Core.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
             if new_user_data.password != "" and new_user_data.username != "":
                 try:
                     Core.new_user2(new_user_data)
                 except sqlite3.IntegrityError:
-                    messagebox.showerror("Greska", "Postoji korisnik sa istim korisnickim imenom")
+                    messagebox.showerror("Greška", "Postoji korisnik sa istim korisničkim imenom")
                 else:
                     self.master.master.tk_get_users()
                     self.master.destroy()
             else:
-                messagebox.showinfo("Obavestenje", "Nisu izmenjeni podaci, nece biti izvrseno azuriranje")
+                messagebox.showinfo("Obaveštenje", "Nisu izmenjeni podaci, neće biti izvršeno ažuriranje")
         pass
 
 
@@ -183,7 +183,7 @@ class ListUsersFrame(LabelFrame):
         try:
             user = self.users[self.lb_users.curselection()[0]]
         except IndexError:
-            messagebox.showwarning("Greska", "Niste izabrali korisnika")
+            messagebox.showwarning("Greška", "Niste izabrali korisnika")
         else:
             toplevel = Toplevel(self)
             EditUserFrame(toplevel, user).pack()
