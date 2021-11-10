@@ -30,5 +30,5 @@ class ClientData:
         self.socket.send(pickle.dumps(data))
         raw_data = self.socket.recv(20000)
         data = pickle.loads(raw_data)
-        return data
         self.socket.close()
+        return data

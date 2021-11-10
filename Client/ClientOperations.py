@@ -1,4 +1,3 @@
-import sqlite3
 import Core
 from datetime import datetime
 import Client
