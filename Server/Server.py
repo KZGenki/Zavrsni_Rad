@@ -3,11 +3,10 @@ import pickle
 
 
 class ServerData:
-    def __init__(self, address, port, trigger):
+    def __init__(self, address, port):
         self.address = address
         self.port = port
         self.socket = None
-        self.trigger = trigger
         self.conn = None
         self.addr = None
 
@@ -19,10 +18,10 @@ class ServerData:
         return True
 
     def get_data(self):
-        print("Got connection from ", addr)
-        raw_data = conn.recv(4096)
+        print("Got connection from ", self.addr)
+        raw_data = self.conn.recv(4096)
         data = pickle.loads(raw_data)
-        conn.close()
+        self.conn.close()
         self.socket.close()
         return data
 

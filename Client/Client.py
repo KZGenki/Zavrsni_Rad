@@ -2,7 +2,7 @@ import socket
 import pickle
 
 
-class DataClient:
+class ClientData:
     def __init__(self, address, port):
         self.addr = address
         self.port = port
