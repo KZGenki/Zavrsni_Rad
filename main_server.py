@@ -1,10 +1,22 @@
 import Server
 import threading
-import socket
+import time
 from tkinter import *
 
 HOST = '127.0.0.1'
 PORT = 50000
+
+
+class Refresher(threading.Thread):
+    def __init__(self, command):
+        threading.Thread.__init__(self)
+        self.command = command
+        self.working = True
+
+    def run(self):
+        while self.working:
+            self.command()
+            time.sleep(1)
 
 
 class Host(threading.Thread):
@@ -19,6 +31,8 @@ class Host(threading.Thread):
     def run(self):
         print("Host has started")
         s = Server.ServerData(HOST, PORT, Server.exec_data)
+        r = Refresher(self.trigger)
+        r.start()
         s.start_socket()
         while self.working:
             if s.wait_for_accept():
@@ -26,11 +40,11 @@ class Host(threading.Thread):
                 self.service_id += 1
                 self.services.append(t)
                 t.start()
-                # s = Server.ServerData(HOST, PORT, Server.exec_data)
                 s.start_socket()
                 self.trigger()
         s.close_socket()
-        print("Host has finished")
+        r.working = False
+        print("Host has stopped")
         pass
 
 
@@ -55,6 +69,7 @@ class Service(threading.Thread):
         self.trigger()
         new_data = Server.exec_data(data)
         if new_data != "kill":
+            # time.sleep(10)
             self.status = "Sending..."
             self.trigger()
             self.server_data.send_data(new_data)
@@ -68,17 +83,21 @@ class Service(threading.Thread):
 
 
 def start():
-    global host_thread
-    label.set("Host pokrenut")
-    host_thread = Host(trigger=update_listbox)
-    host_thread.working = True
-    host_thread.start()
+    global host_thread, message
+    message = "Host pokrenut"
+    label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
+    if host_thread is None or not host_thread.working:
+        host_thread = Host(trigger=update_listbox)
+        host_thread.working = True
+        host_thread.start()
     pass
 
 
 def stop():
+    global message
     if host_thread is not None and host_thread.working:
-        label.set("Host obustavljen")
+        message = "Host obustavljen"
+        label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
         host_thread.working = False
         Server.Plug(HOST, PORT)
     pass
@@ -90,6 +109,7 @@ def on_close():
 
 
 def update_listbox():
+    label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
     lb.delete(0, END)
     if host_thread is not None:
         for service in host_thread.services:
@@ -100,6 +120,7 @@ def update_listbox():
 
 host_thread = None
 server = Tk()
+server.title("Server")
 server.protocol("WM_DELETE_WINDOW", on_close)
 server.rowconfigure(1, weight=1)
 server.columnconfigure(1, weight=1)
@@ -107,11 +128,12 @@ server.columnconfigure(2, weight=1)
 Button(server, text="Start", command=start).grid(row=0, column=0, columnspan=2, sticky="ew")
 Button(server, text="Stop", command=stop).grid(row=0, column=2, columnspan=2, sticky="ew")
 sb = Scrollbar(server)
-lb = Listbox(server, yscrollcommand=sb.set)
+lb = Listbox(server, yscrollcommand=sb.set, width=100)
 sb.config(command=lb.yview)
 lb.grid(row=1, column=0, columnspan=3, sticky="nsew")
 sb.grid(row=1, column=3, sticky="ns")
 label = StringVar()
-label.set("Kliknite Start da bi ste pokrenuli Host servis")
+message = "Kliknite Start da bi ste pokrenuli Host servis"
+label.set(message)
 Label(server, textvariable=label).grid(row=2, column=0, columnspan=4, sticky="w")
 server.mainloop()

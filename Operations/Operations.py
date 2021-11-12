@@ -1,11 +1,11 @@
 import sqlite3
 import Core
 from datetime import datetime
-
+import threading
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
 database = "knjizara.db"
-
+threadLock = threading.Lock()
 
 def now():
     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -109,6 +109,7 @@ def new_user(username, password):
 
 
 def exec_query(query, params=None):
+    threadLock.acquire()
     conn = sqlite3.connect(database)
     if params is None:
         try:
@@ -134,6 +135,7 @@ def exec_query(query, params=None):
     finally:
         conn.commit()
         conn.close()
+        threadLock.release()
         return data
 
 
@@ -156,12 +158,12 @@ def get_list(user, search_object: Search):
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
         query += "(" if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 else ""
-        query += "(ime || ' ' || prezime) LIKE ?" if search_object.use_author == 1 else ""
+        query += "Autor LIKE ?" if search_object.use_author == 1 else ""
         query += " OR " if search_object.use_author+search_object.use_title == 2 else ""
-        query += "naslov LIKE ?" if search_object.use_title == 1 else ""
+        query += "Naslov LIKE ?" if search_object.use_title == 1 else ""
         query += ") AND " if search_object.use_year == 1 and search_object.use_title + search_object.use_author >= 1 \
             else ""
-        query += "godina_izdanja=?" if search_object.use_year == 1 else ""
+        query += "\"Godina izdanja\"=?" if search_object.use_year == 1 else ""
 
     params = []
     for i in range(search_object.use_title + search_object.use_author):

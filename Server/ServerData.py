@@ -4,7 +4,7 @@ import pickle
 
 class Kill:
     def __init__(self):
-        self.classname = "Kill"
+        pass
 
 
 class Plug:
