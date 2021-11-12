@@ -6,121 +6,102 @@ def clear_master(master):
 
 class Login:
     def __init__(self, username="Guest", password="Guest"):
-        self.classname = "Login"
         self.username = username
         self.password = password
 
 
 class NewUser:
     def __init__(self, username, password):
-        self.classname = "NewUser"
         self.username = username
         self.password = password
 
 
 class ExecQuery:
     def __init__(self, query, params=None):
-        self.classname = "ExecQuery"
         self.query = query
         self.params = params
 
 
 class GetList:
     def __init__(self, user, search_object):
-        self.classname = "GetList"
         self.user = user
         self.search_object = search_object
 
 
 class GetBookFromSearch:
     def __init__(self, search_object, index):
-        self.classname = "GetBookFromSearch"
         self.index = index
         self.search_object = search_object
 
 
 class SaveCart:
     def __init__(self, cart):
-        self.classname = "SaveCart"
         self.cart = cart
 
 
 class ListCart:
     def __init__(self, user):
-        self.classname = "ListCart"
         self.user = user
 
 
 class Buy:
     def __init__(self, cart, total_price):
-        self.classname = "Buy"
         self.cart = cart
         self.total_price = total_price
 
 
 class GetUsers:
     def __init__(self):
-        self.classname = "GetUsers"
         pass
 
 
 class UpdateUser:
     def __init__(self, user):
-        self.classname = "UpdateUser"
         self.user = user
 
 
 class NewUser2:
     def __init__(self, user):
-        self.classname = "NewUser2"
         self.user = user
 
 
 class UpdateAuthors:
     def __init__(self, author):
-        self.classname = "UpdateAuthors"
         self.author = author
 
 
 class GetNewAuthorId:
     def __init__(self):
-        self.classname = "GetNewAuthorId"
         pass
 
 
 class GetAuthors:
     def __init__(self, raw_data=None):
-        self.classname = "GetAuthors"
         self.raw_data = raw_data
 
 
 class GetNewPublisherId:
     def __init__(self):
-        self.classname = "GetNewPublisherId"
         pass
 
 
 class UpdatePublishers:
     def __init__(self, publisher):
-        self.classname = "UpdatePublishers"
         self.publisher = publisher
 
 
 class GetPublishers:
     def __init__(self, raw_data=None):
-        self.classname = "GetPublishers"
         self.raw_data = raw_data
 
 
 class GetNewBookId:
     def __init__(self):
-        self.classname = "GetNewBookId"
         pass
 
 
 class GetBooks:
     def __init__(self, raw_data=None, adv=None, restricted=None):
-        self.classname = "GetBooks"
         self.raw_data = raw_data
         self.adv = adv
         self.restricted = restricted
@@ -128,13 +109,11 @@ class GetBooks:
 
 class UpdateBooks:
     def __init__(self, book):
-        self.classname = "UpdateBooks"
         self.book = book
 
 
 class Stats:
     def __init__(self, from_date, to_date, precision):
-        self.classname = Stats.__name__
         self.from_date = from_date
         self.to_date = to_date
         self.precision = precision
@@ -142,21 +121,18 @@ class Stats:
 
 class Reservations:
     def __init__(self, user, index=None):
-        self.classname = Reservations.__name__
         self.user = user
         self.index = index
 
 
 class RemoveReservation:
     def __init__(self, user, book_id):
-        self.classname = RemoveReservation.__name__
         self.user = user
         self.book_id = book_id
 
 
 class AddReservation:
     def __init__(self, user, book, quantity):
-        self.classname = AddReservation.__name__
         self.user = user
         self.book = book
         self.quantity = quantity
@@ -164,7 +140,6 @@ class AddReservation:
 
 class EditReservation:
     def __init__(self, user, book, quantity):
-        self.classname = EditReservation.__name__
         self.user = user
         self.book = book
         self.quantity = quantity

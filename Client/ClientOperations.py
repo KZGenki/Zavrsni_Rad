@@ -1,3 +1,5 @@
+import sqlite3
+
 import Core
 from datetime import datetime
 import Client
@@ -22,7 +24,10 @@ def new_user(username, password):
 
 
 def exec_query(query, params=None):
-    return client.send_receive(Core.ExecQuery(query, params))
+    data = client.send_receive(Core.ExecQuery(query, params))
+    if isinstance(data, sqlite3.OperationalError):
+        raise data
+    return data
 
 
 def get_list(user, search_object):

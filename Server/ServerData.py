@@ -36,13 +36,11 @@ class ServerData:
         return True
 
     def get_data(self):
-        print("Got connection from ", self.addr)
         raw_data = self.conn.recv(4096)
         data = pickle.loads(raw_data)
         return data
 
     def send_data(self, data):
-        print("Got connection from ", self.addr)
         self.conn.send(pickle.dumps(data))  # possible error here
 
     def close_connection(self):

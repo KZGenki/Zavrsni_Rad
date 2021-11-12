@@ -61,28 +61,25 @@ class LoginFrame(Frame):
         self.btnGuest.grid(row=6, column=0)
 
     def tk_login(self):
-        try:
-            self.tk_check_user_pass()
-            result = Operations.login(self.varUsername.get(), self.varPassword.get())
-        except Core.LoginError as e:
-            self.tk_error_label(e)
+        self.tk_check_user_pass()
+        result = Operations.login(self.varUsername.get(), self.varPassword.get())
+        if isinstance(result, Core.LoginError):
+            self.tk_error_label(result)
         else:
             self.main_frame(result)
 
     def tk_new_user(self):
-        try:
-            self.tk_check_user_pass()
-            result = Operations.new_user(self.varUsername.get(), self.varPassword.get())
-        except Core.LoginError as e:
-            self.tk_error_label(e)
+        self.tk_check_user_pass()
+        result = Operations.new_user(self.varUsername.get(), self.varPassword.get())
+        if isinstance(result, Core.LoginError):
+            self.tk_error_label(result)
         else:
             self.main_frame(result)
 
     def tk_guest(self):
-        try:
-            result = Operations.login()
-        except Core.LoginError as e:
-            self.tk_error_label(e)
+        result = Operations.login()
+        if isinstance(result, Core.LoginError):
+            self.tk_error_label(result)
         else:
             self.main_frame(result)
 

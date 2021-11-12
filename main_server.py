@@ -41,6 +41,7 @@ class Service(threading.Thread):
         self.server_data = server_data
         self.trigger = trigger
         self.status = "Ready"
+        self.type = ""
         if server_data is not None:
             self.addr = self.server_data.addr
 
@@ -49,6 +50,7 @@ class Service(threading.Thread):
         self.status = "Receiving..."
         self.trigger()
         data = self.server_data.get_data()
+        self.type = data.__class__.__name__
         self.status = "Executing..."
         self.trigger()
         new_data = Server.exec_data(data)
@@ -62,7 +64,7 @@ class Service(threading.Thread):
         pass
 
     def __str__(self):
-        return self.name + " Status:" + self.status + " Connection:" + str(self.addr)
+        return self.name + " Type:" + self.type + " Status:" + self.status + " Connection:" + str(self.addr)
 
 
 def start():
@@ -75,10 +77,16 @@ def start():
 
 
 def stop():
-    label.set("Host obustavljen")
-    host_thread.working = False
-    Server.Plug(HOST, PORT)
+    if host_thread is not None and host_thread.working:
+        label.set("Host obustavljen")
+        host_thread.working = False
+        Server.Plug(HOST, PORT)
     pass
+
+
+def on_close():
+    stop()
+    exit(0)
 
 
 def update_listbox():
@@ -86,11 +94,13 @@ def update_listbox():
     if host_thread is not None:
         for service in host_thread.services:
             lb.insert(END, service)
+            lb.see(END)
     pass
 
 
 host_thread = None
 server = Tk()
+server.protocol("WM_DELETE_WINDOW", on_close)
 server.rowconfigure(1, weight=1)
 server.columnconfigure(1, weight=1)
 server.columnconfigure(2, weight=1)
