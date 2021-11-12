@@ -5,7 +5,9 @@ import Core
 def exec_data(data):
     print(data)
     new_data = None
-    if data.classname == "Login":
+    if data.classname == "Kill":
+        return "kill"
+    elif data.classname == "Login":
         new_data = Operations.login(data.username, data.password)
     elif data.classname == "NewUser""":
         new_data = Operations.new_user(data.username, data.password)

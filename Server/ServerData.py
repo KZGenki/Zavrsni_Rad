@@ -2,6 +2,21 @@ import socket
 import pickle
 
 
+class Kill:
+    def __init__(self):
+        self.classname = "Kill"
+
+
+class Plug:
+    def __init__(self, address, port):
+        self.address = address
+        self.port = port
+        self.s = socket.socket()
+        self.s.connect((self.address, self.port))
+        self.s.send(pickle.dumps(Kill()))
+        self.s.close()
+
+
 class ServerData:
     def __init__(self, address, port, exec_data=None):
         self.address = address
@@ -34,18 +49,5 @@ class ServerData:
         self.conn.close()
 
     def close_socket(self):
-        self.socket.close()
-
-    def receive_send(self):
-        self.socket = socket.socket()
-        self.socket.bind((self.address, self.port))
-        self.socket.listen(1)
-        self.conn, self.addr = self.socket.accept()
-        print("Got connection from ", self.addr)
-        raw_data = self.conn.recv(4096)
-        data = pickle.loads(raw_data)
-        new_data = self.exec_data(data)
-        self.conn.send(pickle.dumps(new_data))
-        self.conn.close()
         self.socket.close()
 

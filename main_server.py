@@ -1,5 +1,6 @@
 import Server
 import threading
+import socket
 from tkinter import *
 
 HOST = '127.0.0.1'
@@ -28,7 +29,8 @@ class Host(threading.Thread):
                 # s = Server.ServerData(HOST, PORT, Server.exec_data)
                 s.start_socket()
                 self.trigger()
-
+        s.close_socket()
+        print("Host has finished")
         pass
 
 
@@ -50,9 +52,10 @@ class Service(threading.Thread):
         self.status = "Executing..."
         self.trigger()
         new_data = Server.exec_data(data)
-        self.status = "Sending..."
-        self.trigger()
-        self.server_data.send_data(new_data)
+        if new_data != "kill":
+            self.status = "Sending..."
+            self.trigger()
+            self.server_data.send_data(new_data)
         self.server_data.close_connection()
         self.status = "Done."
         self.trigger()
@@ -74,7 +77,7 @@ def start():
 def stop():
     label.set("Host obustavljen")
     host_thread.working = False
-
+    Server.Plug(HOST, PORT)
     pass
 
 
