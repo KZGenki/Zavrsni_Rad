@@ -137,7 +137,7 @@ class EditUserFrame(Frame):
 
     def tk_update_user(self):
         if self.user is not None:
-            new_user_data = Operations.User(self.user.username, self.varPassword.get(), self.varType.get())
+            new_user_data = Core.User(self.user.username, self.varPassword.get(), self.varType.get())
             if new_user_data.password != self.user.password or new_user_data.type != self.user.type:
                 Operations.update_user(new_user_data)
                 self.master.master.tk_get_users()
@@ -145,7 +145,7 @@ class EditUserFrame(Frame):
             else:
                 messagebox.showinfo("Obaveštenje", "Nisu izmenjeni podaci, neće biti izvršeno ažuriranje")
         else:
-            new_user_data = Operations.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
+            new_user_data = Core.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
             if new_user_data.password != "" and new_user_data.username != "":
                 try:
                     Operations.new_user2(new_user_data)

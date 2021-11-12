@@ -5,7 +5,7 @@ import Client
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
 HOST = '127.0.0.1'
-PORT = 50007
+PORT = 50000
 client = Client.ClientData(HOST, PORT)
 
 

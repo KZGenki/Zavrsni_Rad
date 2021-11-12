@@ -1,5 +1,6 @@
 import socket
 import pickle
+from tkinter import messagebox
 
 
 class ClientData:
@@ -26,9 +27,14 @@ class ClientData:
 
     def send_receive(self, data):
         self.socket = socket.socket()
-        self.socket.connect((self.addr, self.port))
-        self.socket.send(pickle.dumps(data))
-        raw_data = self.socket.recv(20000)
-        data = pickle.loads(raw_data)
-        self.socket.close()
-        return data
+        try:
+            self.socket.connect((self.addr, self.port))
+        except ConnectionRefusedError:
+            messagebox.showerror("Greška", "Server nedostupan, aplikacija će se zatvoriti")
+            exit(2)
+        else:
+            self.socket.send(pickle.dumps(data))
+            raw_data = self.socket.recv(20000)
+            data = pickle.loads(raw_data)
+            self.socket.close()
+            return data

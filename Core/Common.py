@@ -127,9 +127,9 @@ class GetBooks:
 
 
 class UpdateBooks:
-    def __init__(self, books):
+    def __init__(self, book):
         self.classname = "UpdateBooks"
-        self.books = books
+        self.book = book
 
 
 class Stats:

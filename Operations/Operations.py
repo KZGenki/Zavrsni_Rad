@@ -4,8 +4,8 @@ from datetime import datetime
 
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
+database = "knjizara.db"
 
-database = "../knjizara.db"
 
 def now():
     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -155,6 +155,13 @@ def get_list(user, search_object: Search):
             "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
             "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca " \
             "INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige WHERE deleted = 0 " \
+            "GROUP BY knjige.id_knjige HAVING Raspoloživo > 0 "\
+            "UNION " \
+            "SELECT naslov AS 'Naslov', godina_izdanja AS 'Godina izdanja', (ime || ' ' || prezime) AS 'Autor', naziv" \
+            " AS 'Izdavač', kolicina_na_stanju as Raspoloživo FROM knjige " \
+            "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
+            "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca " \
+            "WHERE deleted = 0 AND knjige.id_autora NOT IN (SELECT id_knjige FROM rezervacije)" \
             "GROUP BY knjige.id_knjige HAVING Raspoloživo > 0"
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
@@ -196,6 +203,7 @@ def get_book_from_search(search_object, index):
         params.append(search_object.year)
     params.append(index)
     book_id = exec_query(query, params)[1][0]
+    print(book_id, index)
     books = get_books(restricted=True)
     for book in books:
         if book.id_book == book_id:
@@ -350,11 +358,22 @@ def get_books(raw_data=None, adv=None, restricted=None):
         data = exec_query("SELECT knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
                           "(kolicina_na_stanju - SUM(kolicina)) AS raspoloživo , id_izdavaca, deleted "
                           "FROM knjige INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige "
-                          "GROUP BY knjige.id_knjige")
+                          "GROUP BY knjige.id_knjige "
+                          "UNION "
+                          "SELECT id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, "
+                          "kolicina_na_stanju AS raspoloživo , id_izdavaca, deleted "
+                          "FROM knjige WHERE id_knjige NOT IN (SELECT id_knjige FROM rezervacije GROUP BY id_knjige)"
+                          "GROUP BY knjige.id_knjige"
+                          )
     elif adv is not None:
         data = exec_query("SELECT knjige.id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, kolicina_na_stanju"
                           ", (kolicina_na_stanju - SUM(kolicina)) AS raspoloživo , id_izdavaca, deleted "
                           "FROM knjige INNER JOIN rezervacije ON knjige.id_knjige = rezervacije.id_knjige "
+                          "GROUP BY knjige.id_knjige "
+                          "UNION "
+                          "SELECT id_knjige, naslov, id_autora, godina_izdanja, indeks, cena, kolicina_na_stanju"
+                          ", kolicina_na_stanju  AS raspoloživo , id_izdavaca, deleted "
+                          "FROM knjige WHERE id_knjige NOT IN (SELECT id_knjige FROM rezervacije GROUP BY id_knjige)"
                           "GROUP BY knjige.id_knjige")
     else:
         data = exec_query("SELECT * FROM knjige")

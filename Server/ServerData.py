@@ -3,7 +3,7 @@ import pickle
 
 
 class ServerData:
-    def __init__(self, address, port, exec_data):
+    def __init__(self, address, port, exec_data=None):
         self.address = address
         self.port = port
         self.exec_data = exec_data
@@ -11,9 +11,11 @@ class ServerData:
         self.conn = None
         self.addr = None
 
-    def wait_for_accept(self):
+    def start_socket(self):
         self.socket = socket.socket()
         self.socket.bind((self.address, self.port))
+
+    def wait_for_accept(self):
         self.socket.listen(1)
         self.conn, self.addr = self.socket.accept()
         return True
@@ -28,8 +30,10 @@ class ServerData:
         print("Got connection from ", self.addr)
         self.conn.send(pickle.dumps(data))  # possible error here
 
-    def close(self):
+    def close_connection(self):
         self.conn.close()
+
+    def close_socket(self):
         self.socket.close()
 
     def receive_send(self):

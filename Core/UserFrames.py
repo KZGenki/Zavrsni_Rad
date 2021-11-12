@@ -70,7 +70,7 @@ class CartFrame(LabelFrame):
 
     def buy(self):
         if len(self.items) != 0:
-            cart = Operations.Cart(self.master.master.user, self.items, self.quantities)
+            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
             Operations.buy(cart, self.total())
             self.load_reservation()
             self.master.search()
@@ -88,7 +88,7 @@ class CartFrame(LabelFrame):
             self.listbox.delete(index, index + 1)
             self.total()
             if len(self.items) == 0:
-                Operations.save_cart(Operations.Cart(self.master.master.user, [], []))
+                Operations.save_cart(Core.Cart(self.master.master.user, [], []))
                 self.master.search()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
@@ -115,7 +115,7 @@ class CartFrame(LabelFrame):
 
     def reservation(self):
         if len(self.items) != 0:
-            cart = Operations.Cart(self.master.master.user, self.items, self.quantities)
+            cart = Core.Cart(self.master.master.user, self.items, self.quantities)
             Operations.save_cart(cart)
             self.master.search()
         else:

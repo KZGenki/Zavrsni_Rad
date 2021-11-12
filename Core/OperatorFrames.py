@@ -63,7 +63,7 @@ class EditPublisher(Frame):
 
     def tk_update_publisher(self):
         if self.publisher.name != self.varName.get():
-            publisher = Operations.Publisher(self.publisher.id_publisher, self.varName.get())
+            publisher = Core.Publisher(self.publisher.id_publisher, self.varName.get())
             Operations.update_publishers(publisher)
             self.master.destroy()
         else:
@@ -82,13 +82,13 @@ class EditAuthor(Frame):
         Entry(self, textvariable=self.varSurname).grid(row=1, column=1, sticky="ew")
         Button(self, text="Ažuriraj", command=self.tk_update_author).grid(row=2, column=0, columnspan=2, sticky="ew")
         if self.author is None:
-            self.author = Operations.Author(0, "", "")
+            self.author = Core.Author(0, "", "")
         self.varName.set(self.author.name)
         self.varSurname.set(self.author.surname)
 
     def tk_update_author(self):
         if self.author.name != self.varName.get() or self.author.surname != self.varSurname.get():
-            author = Operations.Author(self.author.id_author, self.varName.get(), self.varSurname.get())
+            author = Core.Author(self.author.id_author, self.varName.get(), self.varSurname.get())
             Operations.update_authors(author)
             self.master.destroy()
         else:
@@ -138,9 +138,9 @@ class EditBook(Frame):
             self.cbAuthors.current(self.book.author)
 
     def tk_update_book(self):
-        new_book = Operations.Book(self.book.id_book, self.varTitle.get(), self.cbAuthors.current(), self.varYear.get(),
-                                   self.varIndex.get(), self.varPrice.get(), self.varQuantity.get(),
-                                   self.cbPublishers.current(), self.varHidden.get())
+        new_book = Core.Book(self.book.id_book, self.varTitle.get(), self.cbAuthors.current(), self.varYear.get(),
+                             self.varIndex.get(), self.varPrice.get(), self.varQuantity.get(),
+                             self.cbPublishers.current(), self.varHidden.get())
         if not new_book.equal(self.book):  # and self.book.title is None:
             Operations.update_books(new_book)
             self.master.destroy()
