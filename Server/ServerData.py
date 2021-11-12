@@ -17,6 +17,22 @@ class Plug:
         self.s.close()
 
 
+class ClientData:
+    def __init__(self, conn, addr):
+        self.conn = conn
+        self.addr = addr
+
+    def get_data(self):
+        raw_data = self.conn.recv(4096)
+        data = pickle.loads(raw_data)
+        return data
+
+    def send_data(self, data):
+        self.conn.send(pickle.dumps(data))
+
+    def close_connection(self):
+        self.conn.close()
+
 class ServerData:
     def __init__(self, address, port, exec_data=None):
         self.address = address
@@ -29,22 +45,11 @@ class ServerData:
     def start_socket(self):
         self.socket = socket.socket()
         self.socket.bind((self.address, self.port))
+        self.socket.listen(5)
 
     def wait_for_accept(self):
-        self.socket.listen(1)
-        self.conn, self.addr = self.socket.accept()
-        return True
-
-    def get_data(self):
-        raw_data = self.conn.recv(4096)
-        data = pickle.loads(raw_data)
-        return data
-
-    def send_data(self, data):
-        self.conn.send(pickle.dumps(data))  # possible error here
-
-    def close_connection(self):
-        self.conn.close()
+        conn, addr = self.socket.accept()
+        return conn, addr
 
     def close_socket(self):
         self.socket.close()

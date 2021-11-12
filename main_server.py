@@ -35,13 +35,14 @@ class Host(threading.Thread):
         r.start()
         s.start_socket()
         while self.working:
-            if s.wait_for_accept():
-                t = Service(name="Service" + str(self.service_id), server_data=s, trigger=self.trigger)
-                self.service_id += 1
-                self.services.append(t)
-                t.start()
-                s.start_socket()
-                self.trigger()
+            conn, addr = s.wait_for_accept()
+            c = Server.ClientData(conn, addr)
+            t = Service(name="Service" + str(self.service_id), client_data=c, trigger=self.trigger)
+            self.service_id += 1
+            self.services.append(t)
+            t.start()
+            s.start_socket()
+            self.trigger()
         s.close_socket()
         r.working = False
         print("Host has stopped")
@@ -49,21 +50,21 @@ class Host(threading.Thread):
 
 
 class Service(threading.Thread):
-    def __init__(self, name="Service", server_data=None, trigger=None):
+    def __init__(self, name="Service", client_data=None, trigger=None):
         threading.Thread.__init__(self)
         self.name = name
-        self.server_data = server_data
+        self.client_data = client_data
         self.trigger = trigger
         self.status = "Ready"
         self.type = ""
-        if server_data is not None:
-            self.addr = self.server_data.addr
+        if client_data is not None:
+            self.addr = self.client_data.addr
 
     def run(self):
         print(str(self) + " has started")
         self.status = "Receiving..."
         self.trigger()
-        data = self.server_data.get_data()
+        data = self.client_data.get_data()
         self.type = data.__class__.__name__
         self.status = "Executing..."
         self.trigger()
@@ -72,8 +73,8 @@ class Service(threading.Thread):
             # time.sleep(10)
             self.status = "Sending..."
             self.trigger()
-            self.server_data.send_data(new_data)
-        self.server_data.close_connection()
+            self.client_data.send_data(new_data)
+        self.client_data.close_connection()
         self.status = "Done."
         self.trigger()
         pass
