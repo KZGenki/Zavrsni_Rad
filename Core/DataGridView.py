@@ -31,7 +31,7 @@ class DataGridView(Frame):
         self.bind_all("<MouseWheel>", self.mouse_scroll)
 
     def mouse_scroll(self, arg):
-        if self.tray.winfo_height() > self.winfo_height():
+        if self.tray.winfo_height() > self.winfo_height() - self.scale_v.winfo_width():
             self.var_scale_v.set(self.var_scale_v.get() - arg.delta/120*15)
             self.slider()
 
@@ -85,11 +85,11 @@ class DataGridView(Frame):
         vertical_slider_size = int(scale_height/tray_height*scale_height)
         self.scale_h.config(sliderlength=horizontal_slider_size, to=horizontal_limit)
         self.scale_v.config(sliderlength=vertical_slider_size, to=vertical_limit)
-        if tray_height < self.winfo_height():
+        if tray_height < self.winfo_height()-self.scale_v.winfo_width():
             self.scale_v.config(width=0)
         else:
             self.scale_v.config(width=15)
-        if tray_width < self.winfo_width():
+        if tray_width < self.winfo_width()-self.scale_h.winfo_height():
             self.scale_h.config(width=0)
         else:
             self.scale_h.config(width=15)

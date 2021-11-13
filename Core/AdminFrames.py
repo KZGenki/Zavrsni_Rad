@@ -147,9 +147,7 @@ class EditUserFrame(Frame):
         else:
             new_user_data = Core.User(self.varUsername.get(), self.varPassword.get(), self.varType.get())
             if new_user_data.password != "" and new_user_data.username != "":
-                try:
-                    Operations.new_user2(new_user_data)
-                except sqlite3.IntegrityError:
+                if isinstance(Operations.new_user2(new_user_data), sqlite3.IntegrityError):
                     messagebox.showerror("Greška", "Postoji korisnik sa istim korisničkim imenom")
                 else:
                     self.master.master.tk_get_users()

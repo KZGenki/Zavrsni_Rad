@@ -259,7 +259,7 @@ class OperatorStatsFrame(Frame):
         self.to_date = StringVar()
         self.from_date = StringVar()
         self.from_date.set("2021-10-05")
-        self.to_date.set("2021-11-15")
+        self.to_date.set(Operations.now())
         Radiobutton(self, text="Godina", variable=self.date, value=1).grid(row=0, column=0)
         Radiobutton(self, text="Mesec", variable=self.date, value=2).grid(row=0, column=1)
         Radiobutton(self, text="Dan", variable=self.date, value=3).grid(row=0, column=2)
@@ -296,9 +296,9 @@ class DatePicker(Frame):
         self.cb_month.grid(row=0, column=1)
         self.cb_day.grid(row=0, column=2)
 
-        self.var_year.set(int(self.textvariable.get().split("-")[0]))
-        self.cb_month.set(self.months[int(self.textvariable.get().split("-")[1]) - 1])
-        self.cb_day.current(int(self.textvariable.get().split("-")[2]) - 1)
+        self.var_year.set(int(self.textvariable.get().split(" ")[0].split("-")[0]))
+        self.cb_month.set(self.months[int(self.textvariable.get().split(" ")[0].split("-")[1]) - 1])
+        self.cb_day.current(int(self.textvariable.get().split(" ")[0].split("-")[2]) - 1)
         self.tk_year_picked()
 
     def tk_year_picked(self, arg=None):
@@ -425,7 +425,8 @@ class EditReservation(Frame):
     def tk_update(self):
         if self.varQuantity.get() > 0 and self.varQuantity.get() != self.quantity:
             if self.book is None:
-                if Operations.add_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get()):
+                if not Operations.add_reservation(self.user, self.books[self.cb_book.current()],
+                                                  self.varQuantity.get()):
                     messagebox.showerror("Greška", "Rezervacija već postoji")
             else:
                 Operations.edit_reservation(self.user, self.books[self.cb_book.current()], self.varQuantity.get())

@@ -94,9 +94,8 @@ def login(username="Guest", password="Guest"):
 
 
 def new_user(username, password):
-    conn = sqlite3.connect("knjizara.db")
     data = exec_query("SELECT korisnik FROM korisnici WHERE korisnik=?", (username,))
-    if len(data) != 0:
+    if len(data) != 1:
         raise Core.LoginError("Korisničko ime je zauzeto, unesite drugo ime")
     exec_query("INSERT INTO korisnici (korisnik, password, type) VALUES(?, ?, 1)", (username, password))
     data = exec_query("SELECT * FROM korisnici WHERE korisnik=? AND password =?", (username, password))
@@ -275,8 +274,13 @@ def update_user(user):
 
 
 def new_user2(user):
-    exec_query("INSERT INTO korisnici (korisnik, password, type) values (?, ?, ?)",
-               (user.username, user.password, user.type))
+    try:
+        exec_query("INSERT INTO korisnici (korisnik, password, type) values (?, ?, ?)",
+                   (user.username, user.password, user.type))
+    except sqlite3.IntegrityError as e:
+        return e
+    else:
+        return None
 
 
 def update_authors(author):

@@ -70,7 +70,7 @@ class Service(threading.Thread):
         self.trigger()
         new_data = Server.exec_data(data)
         if new_data != "kill":
-            # time.sleep(10)
+            # time.sleep(10)  # for testing load
             self.status = "Sending..."
             self.trigger()
             self.client_data.send_data(new_data)

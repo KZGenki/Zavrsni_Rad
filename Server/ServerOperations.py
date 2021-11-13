@@ -32,7 +32,7 @@ def exec_data(data):
             new_data = Operations.new_user2(data.user)
         elif isinstance(data, Core.UpdateAuthors):
             new_data = Operations.update_authors(data.author)
-        elif isinstance(data, Core.GetAuthors):
+        elif isinstance(data, Core.GetNewAuthorId):
             new_data = Operations.get_new_author_id()
         elif isinstance(data, Core.GetAuthors):
             new_data = Operations.get_authors(data.raw_data)
