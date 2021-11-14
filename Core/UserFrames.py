@@ -76,7 +76,6 @@ class CartFrame(LabelFrame):
             self.master.search()
         else:
             messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
-        pass
 
     def remove(self):
         try:
@@ -92,7 +91,6 @@ class CartFrame(LabelFrame):
                 self.master.search()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
-        pass
 
     def remove_one(self):
         try:
@@ -111,7 +109,6 @@ class CartFrame(LabelFrame):
             self.total()
         except IndexError as e:
             messagebox.showwarning("Upozorenje", "Niste izabrali stavku u korpi")
-        pass
 
     def reservation(self):
         if len(self.items) != 0:
@@ -120,7 +117,6 @@ class CartFrame(LabelFrame):
             self.master.search()
         else:
             messagebox.showwarning("Upozorenje", "Korpa je prazna, ubacite proizvod u korpu prvo")
-        pass
 
     def load_reservation(self):
         cart = Operations.list_cart(self.master.master.user)
@@ -176,7 +172,6 @@ class Workspace(Frame):
                                                                  self.varYear2.get(), self.varAuthor.get(),
                                                                  self.varTitle.get()))
         self.DataGridView.show_data(data)
-        pass
 
     def add_to_cart(self, arg=None):
         index = self.DataGridView.index()
@@ -185,4 +180,3 @@ class Workspace(Frame):
                                                            self.varTitle.get()), index)
         if book.quantity >= 1:
             self.cart.add(book)
-        pass

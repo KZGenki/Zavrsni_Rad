@@ -28,7 +28,6 @@ class OperatorFrame(Frame):
             self.btn_store["relief"] = SUNKEN
             self.btn_stats["relief"] = RAISED
             self.btn_reservations["relief"] = RAISED
-        pass
 
     def tk_stats(self):
         if self.btn_stats["relief"] != SUNKEN:
@@ -38,7 +37,6 @@ class OperatorFrame(Frame):
             self.btn_store["relief"] = RAISED
             self.btn_stats["relief"] = SUNKEN
             self.btn_reservations["relief"] = RAISED
-        pass
 
     def tk_reservations(self):
         if self.btn_reservations["relief"] != SUNKEN:
@@ -93,7 +91,6 @@ class EditAuthor(Frame):
             self.master.destroy()
         else:
             messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
-        pass
 
 
 class EditBook(Frame):
@@ -146,7 +143,6 @@ class EditBook(Frame):
             self.master.destroy()
         else:
             messagebox.showinfo("Obaveštenje", "Nisu uneti novi podaci, neće biti izvršeno ažuriranje")
-        pass
 
 
 class OperatorStorageFrame(Frame):
@@ -228,7 +224,6 @@ class OperatorStorageFrame(Frame):
         toplevel.grab_set()
         self.wait_window(toplevel)
         self.tk_cb_change()
-        pass
 
     def tk_add_publisher(self):
         publisher = Operations.get_new_publisher_id()
@@ -237,7 +232,6 @@ class OperatorStorageFrame(Frame):
         toplevel.grab_set()
         self.wait_window(toplevel)
         self.tk_cb_change()
-        pass
 
     def tk_add_author(self):
         author = Operations.get_new_author_id()
@@ -246,7 +240,6 @@ class OperatorStorageFrame(Frame):
         toplevel.grab_set()
         self.wait_window(toplevel)
         self.tk_cb_change()
-        pass
 
 
 class OperatorStatsFrame(Frame):
@@ -275,7 +268,6 @@ class OperatorStatsFrame(Frame):
     def tk_filter(self):
         data = Operations.stats(self.from_date.get(), self.to_date.get(), self.date.get())
         self.DataGridView.show_data(data)
-        pass
 
 
 class DatePicker(Frame):
@@ -303,7 +295,6 @@ class DatePicker(Frame):
 
     def tk_year_picked(self, arg=None):
         self.tk_month_picked()
-        pass
 
     def tk_month_picked(self, arg=None):
         index = self.cb_month.current()
@@ -323,13 +314,11 @@ class DatePicker(Frame):
         else:
             self.cb_day.set(day+1)
         self.tk_day_picked()
-        pass
 
     def tk_day_picked(self, arg=None):
         date = str(self.var_year.get()) + "-" + ("0" if (self.cb_month.current() + 1) < 10 else "") + \
                str(self.cb_month.current() + 1) + "-" + ("0" if int(self.cb_day.get()) < 10 else "") + str(self.cb_day.get())
         self.textvariable.set(date)
-        pass
 
     def days31(self, month_index):
         if month_index == 0 or month_index == 2 or month_index == 4 or month_index == 6 \
@@ -356,7 +345,7 @@ class OperatorReservationFrame(Frame):
         Button(self, text="Ukloni", command=self.tk_remove).grid(row=0, column=1, sticky="ew")
         Button(self, text="Izmeni", command=self.tk_edit).grid(row=0, column=2, sticky="ew")
         Button(self, text="Dodaj", command=self.tk_add).grid(row=0, column=3, sticky="ew")
-        self.DataGridView = Core.DataGridView(self)
+        self.DataGridView = Core.DataGridView(self, double_click=self.tk_edit)
         self.DataGridView.grid(row=1, column=0, columnspan=5, sticky="nsew")
         self.tk_user_selected()
 
@@ -376,7 +365,6 @@ class OperatorReservationFrame(Frame):
 
     def tk_add(self):
         self.toplevel(user=self.users[self.cb_users.current()])
-        pass
 
     def tk_edit(self):
         index = self.DataGridView.index()
@@ -386,7 +374,6 @@ class OperatorReservationFrame(Frame):
         user = self.users[self.cb_users.current()]
         row = Operations.reservations(user, index)
         self.toplevel(user=user, book=row[1][0], quantity=row[1][2])
-        pass
 
     def toplevel(self, book=None, user=None, quantity=0):
         toplevel = Toplevel(self)

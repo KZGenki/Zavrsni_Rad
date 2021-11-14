@@ -5,6 +5,9 @@ from tkinter import *
 
 HOST = '127.0.0.1'
 PORT = 50000
+host_thread = None
+execLock = threading.Lock()
+listboxLock = threading.Lock()
 
 
 class Refresher(threading.Thread):
@@ -17,6 +20,8 @@ class Refresher(threading.Thread):
         while self.working:
             self.command()
             time.sleep(1)
+        update_history(self)
+        update_current()
 
 
 class Host(threading.Thread):
@@ -32,6 +37,8 @@ class Host(threading.Thread):
         print("Host has started")
         s = Server.ServerData(HOST, PORT, Server.exec_data)
         r = Refresher(self.trigger)
+        self.services.append(self)
+        self.services.append(r)
         r.start()
         s.start_socket()
         while self.working:
@@ -45,8 +52,8 @@ class Host(threading.Thread):
             self.trigger()
         s.close_socket()
         r.working = False
-        print("Host has stopped")
-        pass
+        update_history(self)
+        update_current()
 
 
 class Service(threading.Thread):
@@ -61,25 +68,24 @@ class Service(threading.Thread):
             self.addr = self.client_data.addr
 
     def run(self):
-        print(str(self) + " has started")
         self.status = "Receiving..."
         self.trigger()
         data = self.client_data.get_data()
         self.type = data.__class__.__name__
         self.status = "Executing..."
         self.trigger()
-        threadLock.acquire()
+        execLock.acquire()
+        # time.sleep(20)  # for testing load
         new_data = Server.exec_data(data)
-        threadLock.release()
+        execLock.release()
         if new_data != "kill":
-            # time.sleep(10)  # for testing load
             self.status = "Sending..."
             self.trigger()
             self.client_data.send_data(new_data)
         self.client_data.close_connection()
         self.status = "Done."
+        update_history(self)
         self.trigger()
-        pass
 
     def __str__(self):
         return self.name + " Type:" + self.type + " Status:" + self.status + " Connection:" + str(self.addr)
@@ -90,7 +96,7 @@ def start():
     message = "Host pokrenut"
     label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
     if host_thread is None or not host_thread.working:
-        host_thread = Host(trigger=update_listbox)
+        host_thread = Host(trigger=update_current)
         host_thread.working = True
         host_thread.start()
     pass
@@ -103,7 +109,7 @@ def stop():
         label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
         host_thread.working = False
         Server.Plug(HOST, PORT)
-    pass
+    update_current()
 
 
 def on_close():
@@ -111,33 +117,46 @@ def on_close():
     exit(0)
 
 
-def update_listbox():
+def update_current():
     label.set(message + " Broj aktivnih niti:" + str(threading.active_count()))
-    lb.delete(0, END)
+    lb_current.delete(0, END)
     if host_thread is not None:
         for service in host_thread.services:
-            lb.insert(END, service)
-            lb.see(END)
-    pass
+            if service.is_alive():
+                lb_current.insert(END, service)
+                lb_current.see(END)
 
 
-host_thread = None
-threadLock = threading.Lock()
-server = Tk()
-server.title("Server")
-server.protocol("WM_DELETE_WINDOW", on_close)
-server.rowconfigure(1, weight=1)
-server.columnconfigure(1, weight=1)
-server.columnconfigure(2, weight=1)
-Button(server, text="Start", command=start).grid(row=0, column=0, columnspan=2, sticky="ew")
-Button(server, text="Stop", command=stop).grid(row=0, column=2, columnspan=2, sticky="ew")
-sb = Scrollbar(server)
-lb = Listbox(server, yscrollcommand=sb.set, width=100)
-sb.config(command=lb.yview)
-lb.grid(row=1, column=0, columnspan=3, sticky="nsew")
-sb.grid(row=1, column=3, sticky="ns")
-label = StringVar()
-message = "Kliknite Start da bi ste pokrenuli Host servis"
-label.set(message)
-Label(server, textvariable=label).grid(row=2, column=0, columnspan=4, sticky="w")
-server.mainloop()
+def update_history(service):
+    listboxLock.acquire()
+    lb_history.insert(END, service)
+    lb_history.see(END)
+    listboxLock.release()
+
+
+if __name__ == '__main__':
+    server = Tk()
+    server.title("Server")
+    server.protocol("WM_DELETE_WINDOW", on_close)
+    server.rowconfigure(2, weight=1)
+    server.columnconfigure(0, weight=1)
+    server.columnconfigure(2, weight=1)
+    Button(server, text="Start", command=start).grid(row=0, column=0, columnspan=2, sticky="ew")
+    Button(server, text="Stop", command=stop).grid(row=0, column=2, columnspan=2, sticky="ew")
+    Label(text="Aktivni servisi").grid(row=1, column=0, columnspan=2, sticky="ew")
+    Label(text="Gotovi servisi").grid(row=1, column=2, columnspan=2, sticky="ew")
+    sb_current = Scrollbar(server)
+    sb_history = Scrollbar(server)
+    lb_current = Listbox(server, yscrollcommand=sb_current.set, width=50)
+    lb_history = Listbox(server, yscrollcommand=sb_history.set, width=50)
+    sb_current.config(command=lb_current.yview)
+    sb_history.config(command=lb_history.yview)
+    lb_current.grid(row=2, column=0, sticky="nsew")
+    sb_current.grid(row=2, column=1, sticky="ns")
+    lb_history.grid(row=2, column=2, sticky="nsew")
+    sb_history.grid(row=2, column=3, sticky="ns")
+    label = StringVar()
+    message = "Kliknite Start da bi ste pokrenuli Host servis"
+    label.set(message)
+    Label(server, textvariable=label).grid(row=3, column=0, columnspan=4, sticky="w")
+    server.mainloop()
