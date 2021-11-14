@@ -68,7 +68,9 @@ class Service(threading.Thread):
         self.type = data.__class__.__name__
         self.status = "Executing..."
         self.trigger()
+        threadLock.acquire()
         new_data = Server.exec_data(data)
+        threadLock.release()
         if new_data != "kill":
             # time.sleep(10)  # for testing load
             self.status = "Sending..."
@@ -120,6 +122,7 @@ def update_listbox():
 
 
 host_thread = None
+threadLock = threading.Lock()
 server = Tk()
 server.title("Server")
 server.protocol("WM_DELETE_WINDOW", on_close)

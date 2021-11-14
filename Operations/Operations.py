@@ -1,11 +1,9 @@
 import sqlite3
 import Core
 from datetime import datetime
-import threading
 
 user_types = ["Gost", "Korisnik", "Operator", "Administrator"]
 database = "knjizara.db"
-threadLock = threading.Lock()
 
 def now():
     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -108,7 +106,6 @@ def new_user(username, password):
 
 
 def exec_query(query, params=None):
-    threadLock.acquire()
     conn = sqlite3.connect(database)
     if params is None:
         try:
@@ -134,7 +131,6 @@ def exec_query(query, params=None):
     finally:
         conn.commit()
         conn.close()
-        threadLock.release()
         return data
 
 
@@ -152,7 +148,7 @@ def get_list(user, search_object: Search):
             "AS 'Autor', naziv AS 'Izdavač', kolicina_na_stanju as Raspoloživo FROM knjige " \
             "INNER JOIN autori ON knjige.id_autora = autori.id_autora " \
             "INNER JOIN izdavaci ON knjige.id_izdavaca = izdavaci.id_izdavaca " \
-            "WHERE deleted = 0 AND knjige.id_autora NOT IN (SELECT id_knjige FROM rezervacije) " \
+            "WHERE deleted = 0 AND knjige.id_knjige NOT IN (SELECT id_knjige FROM rezervacije) " \
             "GROUP BY knjige.id_knjige HAVING Raspoloživo > 0 ORDER BY knjige.id_knjige ASC)"
     if search_object.use_author + search_object.use_year + search_object.use_title >= 1:
         query += " WHERE "
