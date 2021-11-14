@@ -9,6 +9,8 @@ class DataGridView(Frame):
         self.first_time = True
         self.lb_group = []
         self.btn_group = []
+        self.indexes = []
+        self.btn_indicator = 0
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.corner = Frame(self)
@@ -17,7 +19,6 @@ class DataGridView(Frame):
         self.var_scale_h = IntVar()
         self.scale_v = Scale(self, variable=self.var_scale_v, orient=VERTICAL, showvalue=0, resolution=1, from_=0,
                              to=1000, sliderlength=20, command=self.slider, width=15)
-
         self.scale_h = Scale(self, variable=self.var_scale_h, orient=HORIZONTAL, showvalue=0, resolution=1, from_=0,
                              to=1000, sliderlength=20, command=self.slider, width=15)
         self.scale_v.grid(row=0, column=1, sticky="ns")
@@ -39,7 +40,7 @@ class DataGridView(Frame):
         self.tray.place_configure(x=-self.var_scale_h.get(), y=-self.var_scale_v.get())
         pass
 
-    def show_data(self, sql_data):
+    def show_data(self, sql_data, sorted=False):
         Core.clear_master(self.tray)
         self.data = sql_data
         self.lb_group = []
@@ -47,10 +48,21 @@ class DataGridView(Frame):
         try:
             columns = len(self.data[0])
             rows = len(self.data)-1
+            if not sorted:
+                self.indexes = list(range(rows))
+                self.btn_indicator = 0
             lb_width = self.lb_min_width
             for i in range(columns):
-                self.btn_group.append(Button(self.tray, height=1, text=self.data[0][i], relief=FLAT,
-                                             command=lambda j=i: self.btn_header(j)))
+                if self.btn_indicator != 0 and i == abs(self.btn_indicator)-1:
+                    if self.btn_indicator < 0:
+                        self.btn_group.append(Button(self.tray, height=1, text=self.data[0][i], relief=SUNKEN,
+                                                     command=lambda j=i: self.btn_header(j)))
+                    else:
+                        self.btn_group.append(Button(self.tray, height=1, text=self.data[0][i], relief=RAISED,
+                                                     command=lambda j=i: self.btn_header(j)))
+                else:
+                    self.btn_group.append(Button(self.tray, height=1, text=self.data[0][i], relief=FLAT,
+                                                 command=lambda j=i: self.btn_header(j)))
                 self.lb_group.append(Listbox(self.tray, selectmode=SINGLE, exportselection=0, height=rows,
                                              borderwidth=0, highlightthickness=0))
                 max_width = 0
@@ -95,6 +107,7 @@ class DataGridView(Frame):
             self.scale_h.config(width=15)
 
     def btn_header(self, arg=None):
+        self.sort(arg)
         pass
 
     def lb_select(self, arg):
@@ -125,16 +138,41 @@ class DataGridView(Frame):
 
     def lb_double_click(self, arg):
         if self.double_click is not None:
-            self.double_click(self.lb_group[0].curselection()[0])
+            self.double_click(self.indexes[self.lb_group[0].curselection()[0]])
         pass
 
     def index(self, new_index=None):
         if new_index is None:
             try:
-                return self.lb_group[0].curselection()[0]
+                return self.indexes[self.lb_group[0].curselection()[0]]
             except IndexError:
                 return -1
         else:
             for listbox in self.lb_group:
                 listbox.select_clear(0, END)
                 listbox.select_set(new_index)
+
+    def sort(self, column):
+        data_to_sort = []
+        sort_reverse = False
+        if self.btn_group[column]["relief"] == SUNKEN:
+            sort_reverse = True
+            self.btn_indicator = column+1
+        else:
+            sort_reverse = False
+            self.btn_indicator = -(column+1)
+
+        for i in range(len(self.data)-1):
+            data_to_sort.append(self.data[i+1])
+
+        def sorting_criteria(row):
+            return row[1][column]
+
+        self.indexes, data_to_sort = (list(t) for t in zip(*sorted(
+            zip(self.indexes, data_to_sort), key=sorting_criteria, reverse=sort_reverse)))
+        new_data = [self.data[0]]
+        for row in data_to_sort:
+            new_data.append(row)
+        self.show_data(new_data, True)
+
+

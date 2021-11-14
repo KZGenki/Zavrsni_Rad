@@ -168,10 +168,10 @@ class Search:
 
 
 class Author:
-    def __init__(self, id_author, name=None, surname=None):
+    def __init__(self, id_author, name="", surname=""):
         self.id_author = id_author
-        self.name = "" if name is None else name
-        self.surname = "" if surname is None else surname
+        self.name = name
+        self.surname = surname
 
     def __str__(self):
         return self.name + " " + self.surname
@@ -187,17 +187,17 @@ class Publisher:
 
 
 class Book:
-    def __init__(self, id_book, title=None, author=None, year=None, index=None, price=None, quantity=None,
-                 publisher=None, hidden=None):
+    def __init__(self, id_book, title="", author=0, year=2021, index="", price=0, quantity=0,
+                 publisher=0, hidden=0):
         self.id_book = id_book
-        self.title = "" if title is None else title
-        self.author = 0 if author is None else author
-        self.year = 2021 if year is None else year
-        self.index = "" if index is None else index
-        self.price = 0 if price is None else price
-        self.quantity = 0 if quantity is None else quantity
-        self.publisher = 0 if publisher is None else publisher
-        self.hidden = 0 if hidden is None else hidden
+        self.title = title
+        self.author = author
+        self.year = year
+        self.index = index
+        self.price = price
+        self.quantity = quantity
+        self.publisher = publisher
+        self.hidden = hidden
 
     def __str__(self):
         return self.title
